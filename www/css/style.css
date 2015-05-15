@@ -1,0 +1,15 @@
+body {
+  font-family: 'Open Sans', sans-serif;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+.canvas-wrapper {
+  display: inline-block;
+  margin: 20px;
+  border: 4px solid black;
+}
+
+#source {
+}
