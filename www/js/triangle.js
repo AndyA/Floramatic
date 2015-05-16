@@ -4,6 +4,7 @@ function Triangle(x, y, r, a) {
   this.setAngle(a);
   this.hs = 10; // handle size
   this.colours = ['rgb(255, 128, 128)', 'rgb(128, 255, 128)', 'rgb(128, 128, 255)', 'white'];
+  this.canvas_keeper = new CanvasKeeper();
 }
 
 $.extend(Triangle.prototype, {
@@ -126,19 +127,12 @@ $.extend(Triangle.prototype, {
     ctx.fill();
   },
 
-  makeCanvas: function(w, h) {
-    var canvas = document.createElement('canvas');
-    canvas.width = w;
-    canvas.height = h;
-    return canvas
-  },
-
   cuttingForRadius: function(r) {
     var tx = Math.cos(Math.PI / 6) * r;
     var ty = Math.sin(Math.PI / 6) * r;
 
     return {
-      image: this.makeCanvas(Math.floor(tx * 2 + 2), Math.floor(ty + r + 2)),
+      image: this.canvas_keeper.getCanvas(Math.floor(tx * 2 + 2), Math.floor(ty + r + 2)),
       tri_x: tx,
       tri_y: ty,
       centre_x: tx + 1,
@@ -190,6 +184,10 @@ $.extend(Triangle.prototype, {
     return cut;
   },
 
+  releaseCutting: function(cut) {
+    this.canvas_keeper.releaseCanvas(cut.image);
+  },
+
   expand: function(cut) {
     var ncut = this.cuttingForRadius(cut.r * 2);
     var ctx = ncut.image.getContext('2d');
@@ -211,6 +209,9 @@ $.extend(Triangle.prototype, {
     }
 
     ctx.restore();
+
+    // Assume we're done with the context in cut
+    this.releaseCutting(cut);
 
     return ncut;
   }

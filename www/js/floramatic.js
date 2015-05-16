@@ -46,6 +46,7 @@ $(function() {
       dst_ctx.translate(dst_cvs.width / 2, dst_cvs.height / 2);
       if (rot % 2) dst_ctx.rotate(Math.PI);
       dst_ctx.drawImage(cutting.image, -cutting.centre_x, -cutting.centre_y);
+      triangle.releaseCutting(cutting);
     }
 
     triangle.drawController(src_ctx);
