@@ -16,7 +16,7 @@ $(function() {
   var dst_cvs = $destination[0];
   var dst_ctx = dst_cvs.getContext('2d');
 
-  var triangle = new Triangle(src_cvs.width / 2, src_cvs.height / 2, Math.min(src_cvs.width, src_cvs.height) / 5, 0);
+  var triangle = null;
   var zoom = null;
   var image = null;
 
@@ -54,6 +54,28 @@ $(function() {
     dst_ctx.restore();
     src_ctx.restore();
   }
+
+  function resize() {
+    $('.canvas-wrapper').each(function() {
+      var $this = $(this);
+      var $canvas = $this.find('canvas');
+      $canvas.attr({
+        width: $this.width(),
+        height: $this.height()
+      });
+    });
+
+    if (zoom) zoom.setCanvasSize(src_cvs.width, src_cvs.height);
+    if (!triangle) {
+      var radius = Math.min(src_cvs.width, src_cvs.height) / 5;
+      triangle = new Triangle(src_cvs.width / 2, src_cvs.height / 2, radius, 0);
+    }
+    redraw();
+  }
+
+  $(window).resize(function() {
+    resize();
+  });
 
   $.ajax({
     url: manifest,
@@ -120,6 +142,6 @@ $(function() {
     });
   });
 
-  redraw();
+  resize();
 
 });

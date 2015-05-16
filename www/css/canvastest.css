@@ -1,0 +1,7 @@
+.canvas-wrapper {
+  width: calc(50vw - 40px);
+  height: calc(100vh - 100px);
+  border: 1px solid black;
+  dieplay: inline-block;
+  float: left;
+}
