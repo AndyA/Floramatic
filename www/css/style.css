@@ -7,8 +7,10 @@ body {
 
 .canvas-wrapper {
   display: inline-block;
+  float: left;
   margin: 20px;
   border: 4px solid black;
+  padding: 0;
 }
 
 #source {

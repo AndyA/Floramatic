@@ -3,19 +3,29 @@ $(function() {
   var manifest = 'art/manifest.json';
   var current = "Lilium";
 
-  var $canvas = $('#source');
-  var canvas = $canvas[0];
-  var context = canvas.getContext('2d');
+  var $source = $('#source');
+  var src_canvas = $source[0];
+  var src_ctx = src_canvas.getContext('2d');
+
+  var $destination = $('#destination');
+  var dst_canvas = $destination[0];
+  var dst_ctx = dst_canvas.getContext('2d');
 
   var metrics = {
     handle_radius: 10
   };
 
   var triangle = {
-    x: canvas.width / 2,
-    y: canvas.height / 2,
-    r: Math.min(canvas.width, canvas.height) / 3,
+    x: src_canvas.width / 2,
+    y: src_canvas.height / 2,
+    r: Math.min(src_canvas.width, src_canvas.height) / 3,
     a: 0
+  };
+
+  var image = {
+    x: 0,
+    y: 0,
+    i: null
   };
 
   function makeCorners(tri) {
@@ -38,6 +48,7 @@ $(function() {
 
   function drawTriangle(ctx, tri) {
     ctx.lineWidth = 3;
+    ctx.strokeStyle = 'white';
     var corners = makeCorners(tri);
     ctx.beginPath();
 
@@ -88,15 +99,64 @@ $(function() {
     return null;
   }
 
-  function redraw() {
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    drawTriangle(context, triangle);
+  function sample(ctx, img, tri) {
+    if (!image.i) return;
+
+    var csize = tri.r * 2;
+
+    var buf = document.createElement('canvas');
+    buf.width = buf.height = csize;
+
+    var bctx = buf.getContext('2d');
+    bctx.drawImage(image.i, img.x - tri.x + tri.r, img.y - tri.y + tri.r);
+    bctx.globalCompositeOperation = 'destination-in';
+    var stri = {
+      x: tri.r,
+      y: tri.r,
+      r: tri.r,
+      a: tri.a
+    };
+
+    var corners = makeCorners(stri);
+    bctx.beginPath();
+    for (var i = 0; i < corners.length; i++) {
+      var dot = corners[i];
+      if (i == 0) bctx.moveTo(dot.x, dot.y);
+      else bctx.lineTo(dot.x, dot.y);
+    }
+    bctx.fill();
+
+    dst_ctx.clearRect(0, 0, dst_canvas.width, dst_canvas.height);
+    dst_ctx.drawImage(buf, (dst_canvas.width - csize) / 2, (dst_canvas.height - csize) / 2);
   }
 
-  $canvas.mousedown(function(e) {
+  function redraw() {
+    src_ctx.clearRect(0, 0, src_canvas.width, src_canvas.height);
+    if (image.i) {
+      src_ctx.drawImage(image.i, image.x, image.y);
+    }
+    drawTriangle(src_ctx, triangle);
+    sample(src_ctx, image, triangle);
+  }
+
+  $.ajax({
+    url: manifest,
+    dataType: 'json'
+  }).done(function(mani) {
+    var $img = $('<img></img>').load(function() {
+      image.i = $img[0];
+      redraw();
+    }).attr({
+      src: 'art/' + mani[current]
+    });
+  }).fail(function() {
+    console.log("Can't load " + manifest);
+  });
+
+  $source.mousedown(function(e) {
     var hit = decodeClick(triangle, e.offsetX, e.offsetY);
     if (hit) {
-      $canvas.mousemove(function(e) {
+      $source.mousemove(function(e) {
         var x = e.offsetX - hit.dx;
         var y = e.offsetY - hit.dy;
         if (hit.pt == 4) {
@@ -112,25 +172,12 @@ $(function() {
       });
 
       $('body').mouseup(function(e) {
-        $canvas.off('mousemove');
+        $source.off('mousemove');
         $(this).off('mouseup');
       });
     }
   });
 
   redraw();
-
-  $.ajax({
-    url: manifest,
-    dataType: 'json'
-  }).done(function(mani) {
-    var $img = $('<img></img>').load(function() {
-      console.log("image loaded");
-    }).attr({
-      src: 'art/' + mani[current]
-    });
-  }).fail(function() {
-    console.log("Can't load " + manifest);
-  });
 
 });
