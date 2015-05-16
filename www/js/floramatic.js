@@ -1,8 +1,13 @@
 $(function() {
 
   var manifest = 'art/manifest.json';
-  var current = "Lilium";
-
+  //  var current = "Blue Spikes";
+  //  var current = "Deep Blue";
+  //  var current = "Hippie";
+  //  var current = "Lilium";
+  var current = "Orange";
+  //  var current = "Purple Rose";
+  //  var current = "Red Spikes";
   var $source = $('#source');
   var src_cvs = $source[0];
   var src_ctx = src_cvs.getContext('2d');
@@ -11,118 +16,35 @@ $(function() {
   var dst_cvs = $destination[0];
   var dst_ctx = dst_cvs.getContext('2d');
 
-  var metrics = {
-    handle_radius: 10,
-    squeeze: 0.5
-  };
-
-  var triangle = new Triangle(src_cvs.width / 2, src_cvs.height / 2, Math.min(src_cvs.width, src_cvs.height) / 3, 0);
+  var triangle = new Triangle(src_cvs.width / 2, src_cvs.height / 2, Math.min(src_cvs.width, src_cvs.height) / 5, 0);
   var zoom = null;
-
-  var image = {
-    x: 0,
-    y: 0,
-    i: null
-  };
-
-  function makeCanvas(w, h) {
-    var cvs = document.createElement('canvas');
-    cvs.width = w;
-    cvs.height = h;
-    return cvs
-  }
-
-  function sample(ctx, img, tri) {
-    if (!image.i) return;
-
-    var csize = tri.r * 2;
-
-    var buf = makeCanvas(csize, csize);
-    var bctx = buf.getContext('2d');
-    bctx.drawImage(img.i, img.x - tri.x + tri.r, img.y - tri.y + tri.r);
-    bctx.globalCompositeOperation = 'destination-in';
-
-    var stri = new Triangle(tri.r, tri.r, tri.r, tri.a);
-
-    stri.fill(bctx);
-
-    return {
-      canvas: buf,
-      tri: stri
-    };
-  }
-
-  function tileTriangle(ctx, img, tri) {
-    var base_height = Math.sin(Math.PI / 6) * tri.r;
-
-    ctx.save();
-    ctx.rotate(tri.a);
-    ctx.drawImage(img, -tri.r, -tri.r);
-    ctx.restore();
-
-    for (var i = 0; i < 3; i++) {
-      var rot = i * Math.PI * 2 / 3;
-      ctx.save();
-      ctx.rotate(rot);
-      ctx.scale(1, -1);
-      ctx.translate(0, base_height * 2);
-      ctx.rotate(tri.a - rot);
-      ctx.drawImage(img, -tri.r, -tri.r);
-      ctx.restore();
-    }
-  }
-
-  function doubleTriangle(img, tri) {
-    var buf = makeCanvas(img.width * 2, img.height * 2);
-
-    var ctx = buf.getContext('2d');
-    ctx.save();
-
-    ctx.translate(img.width, img.height);
-    ctx.rotate(Math.PI);
-
-    tileTriangle(ctx, img, tri);
-    ctx.restore();
-
-    return {
-      canvas: buf,
-      tri: new Triangle(tri.x * 2, tri.y * 2, tri.r * 2, 0)
-    }
-  }
+  var image = null;
 
   function redraw() {
     src_ctx.save();
     dst_ctx.save();
+
     src_ctx.clearRect(0, 0, src_cvs.width, src_cvs.height);
-    var dim = Math.max(src_cvs.width, src_cvs.height);
-    if (image.i) {
+    dst_ctx.clearRect(0, 0, dst_cvs.width, dst_cvs.height);
+
+    if (image) {
 
       src_ctx.save();
       zoom.setupContext(src_ctx);
-      src_ctx.drawImage(image.i, 0, 0);
+      src_ctx.drawImage(image, 0, 0);
       src_ctx.restore();
 
-      dst_ctx.clearRect(0, 0, dst_cvs.width, dst_cvs.height);
-
-      if (0) {
-        var rot = 0;
-        var root = sample(src_ctx, image, triangle);
-        while (root.tri.r < dim / 1.5) {
-          root = doubleTriangle(root.canvas, root.tri);
-          rot = 1 - rot;
-        }
-        dst_ctx.translate(dst_cvs.width / 2, dst_cvs.height / 2);
-        dst_ctx.rotate(Math.PI * rot);
-        tileTriangle(dst_ctx, root.canvas, root.tri);
+      var cutting = triangle.sample(image, zoom);
+      var dim = Math.max(dst_cvs.width, dst_cvs.height) * 1.4;
+      while (cutting.r < dim) {
+        cutting = triangle.expand(cutting);
       }
-      else {
-        var samp = triangle.sample(image.i, zoom);
-        dst_ctx.translate(dst_cvs.width / 2 - samp.cx, dst_cvs.height / 2 - samp.cy);
-        dst_ctx.drawImage(samp.image, 0, 0);
-
-      }
+      dst_ctx.translate(dst_cvs.width / 2 - cutting.centre_x, dst_cvs.height / 2 - cutting.centre_y);
+      dst_ctx.drawImage(cutting.image, 0, 0);
     }
+
     triangle.drawController(src_ctx);
+
     dst_ctx.restore();
     src_ctx.restore();
   }
@@ -132,8 +54,8 @@ $(function() {
     dataType: 'json'
   }).done(function(mani) {
     var $img = $('<img></img>').load(function() {
-      image.i = $img[0];
-      zoom = new ZoomPan(src_cvs.width, src_cvs.height, image.i.width, image.i.height);
+      image = $img[0];
+      zoom = new ZoomPan(src_cvs.width, src_cvs.height, image.width, image.height);
       redraw();
     }).attr({
       src: 'art/' + mani[current]

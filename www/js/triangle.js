@@ -147,15 +147,24 @@ $.extend(Triangle.prototype, {
     ctx.restore();
   },
 
+  cuttingForRadius: function(r) {
+    var tx = Math.cos(Math.PI / 6) * r;
+    var ty = Math.sin(Math.PI / 6) * r;
+
+    return {
+      image: this.makeCanvas(Math.floor(tx * 2 + 2), Math.floor(ty + r + 2)),
+      tri_x: tx,
+      tri_y: ty,
+      centre_x: tx + 1,
+      centre_y: ty + 1,
+      r: r
+    }
+  },
+
   sample: function(img, zoom) {
-    var cx = Math.cos(Math.PI / 6) * this.r;
-    var cy = Math.sin(Math.PI / 6) * this.r;
 
-    var w = Math.round(cx * 2);
-    var h = Math.round(cy + this.r);
-
-    var cvs = this.makeCanvas(w, h);
-    var ctx = cvs.getContext('2d');
+    var cut = this.cuttingForRadius(this.r);
+    var ctx = cut.image.getContext('2d');
 
     ctx.save();
 
@@ -164,7 +173,7 @@ $.extend(Triangle.prototype, {
 
     ctx.translate(ccx, ccy);
     ctx.scale(zoom.scale, zoom.scale);
-    ctx.translate((cx - ccx) / zoom.scale, (cy - ccy) / zoom.scale);
+    ctx.translate((cut.centre_x - ccx) / zoom.scale, (cut.centre_y - ccy) / zoom.scale);
     ctx.rotate(this.a);
     ctx.translate((zoom.ox - zoom.iw / 2) + (ccx - this.x) / zoom.scale, (zoom.oy - zoom.ih / 2) + (ccy - this.y) / zoom.scale);
 
@@ -175,21 +184,46 @@ $.extend(Triangle.prototype, {
     // Mask with our triangle
     ctx.save();
 
+    var grow = 1.5;
+    var gr = this.r + grow;
+
+    var tx = cut.tri_x / this.r * gr;
+    var ty = cut.tri_y / this.r * gr;
+
     ctx.globalCompositeOperation = 'destination-in';
+    ctx.translate(cut.centre_x, cut.centre_y);
     ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo((w - 1) / 2, h - 1);
-    ctx.lineTo(w - 1, 0);
+    ctx.moveTo(0, gr);
+    ctx.lineTo(tx, -ty);
+    ctx.lineTo(-tx, -ty);
     ctx.closePath();
     ctx.fill();
 
     ctx.restore();
 
-    return {
-      image: cvs,
-      cx: cx,
-      cy: cy
-    };
+    return cut;
+  },
+
+  expand: function(cut) {
+    var ncut = this.cuttingForRadius(cut.r * 2);
+    var ctx = ncut.image.getContext('2d');
+
+    ctx.translate(ncut.centre_x, ncut.centre_y);
+    ctx.rotate(Math.PI);
+    ctx.drawImage(cut.image, -cut.centre_x, -cut.centre_y);
+
+    for (var i = 0; i < 3; i++) {
+      ctx.save();
+      ctx.rotate(Math.PI * i * 2 / 3);
+      ctx.translate(0, -cut.tri_y);
+      ctx.scale(1, -1);
+      ctx.translate(0, cut.tri_y);
+      ctx.rotate(-Math.PI * i * 2 / 3);
+      ctx.drawImage(cut.image, -cut.centre_x, -cut.centre_y);
+      ctx.restore();
+    }
+
+    return ncut;
   }
 
 });
