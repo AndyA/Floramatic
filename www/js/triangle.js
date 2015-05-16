@@ -9,15 +9,18 @@ function Triangle(x, y, r, a) {
 $.extend(Triangle.prototype, {
 
   setCentre: function(x, y) {
+    //    console.log('setCentre(' + x + ', ' + y + ')');
     this.x = x;
     this.y = y;
   },
 
   setRadius: function(r) {
+    //    console.log('setRadius(' + r + ')');
     this.r = r;
   },
 
   setAngle: function(a) {
+    //    console.log('setAngle(' + a + ')');
     this.a = a;
   },
 
@@ -130,23 +133,6 @@ $.extend(Triangle.prototype, {
     return canvas
   },
 
-  drawOrigin: function(ctx, style) {
-    ctx.save();
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = style;
-    ctx.beginPath();
-
-    var r = 10;
-    while (r < 500) {
-      ctx.moveTo(r, 0);
-      ctx.arc(0, 0, r, 0, 2 * Math.PI);
-      r *= 1.1;
-    }
-
-    ctx.stroke();
-    ctx.restore();
-  },
-
   cuttingForRadius: function(r) {
     var tx = Math.cos(Math.PI / 6) * r;
     var ty = Math.sin(Math.PI / 6) * r;
@@ -207,6 +193,7 @@ $.extend(Triangle.prototype, {
   expand: function(cut) {
     var ncut = this.cuttingForRadius(cut.r * 2);
     var ctx = ncut.image.getContext('2d');
+    ctx.save();
 
     ctx.translate(ncut.centre_x, ncut.centre_y);
     ctx.rotate(Math.PI);
@@ -222,6 +209,8 @@ $.extend(Triangle.prototype, {
       ctx.drawImage(cut.image, -cut.centre_x, -cut.centre_y);
       ctx.restore();
     }
+
+    ctx.restore();
 
     return ncut;
   }

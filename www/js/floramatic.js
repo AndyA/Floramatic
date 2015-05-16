@@ -36,11 +36,16 @@ $(function() {
 
       var cutting = triangle.sample(image, zoom);
       var dim = Math.max(dst_cvs.width, dst_cvs.height) * 1.4;
+
+      var rot = 0;
       while (cutting.r < dim) {
         cutting = triangle.expand(cutting);
+        rot++;
       }
-      dst_ctx.translate(dst_cvs.width / 2 - cutting.centre_x, dst_cvs.height / 2 - cutting.centre_y);
-      dst_ctx.drawImage(cutting.image, 0, 0);
+
+      dst_ctx.translate(dst_cvs.width / 2, dst_cvs.height / 2);
+      if (rot % 2) dst_ctx.rotate(Math.PI);
+      dst_ctx.drawImage(cutting.image, -cutting.centre_x, -cutting.centre_y);
     }
 
     triangle.drawController(src_ctx);
@@ -78,19 +83,24 @@ $(function() {
   $source.mousedown(function(e) {
     if (!zoom) return;
 
-    var init_x = e.offsetX;
-    var init_y = e.offsetY;
+    var offsetX = (e.offsetX || e.pageX - $(e.target).offset().left);
+    var offsetY = (e.offsetY || e.pageY - $(e.target).offset().top);
+
+    var init_x = offsetX;
+    var init_y = offsetY;
     var init_zoom = zoom.getState();
 
     var hit = triangle.decodeClick(init_x, init_y);
     $source.mousemove(function(e) {
+      var offsetX = (e.offsetX || e.pageX - $(e.target).offset().left);
+      var offsetY = (e.offsetY || e.pageY - $(e.target).offset().top);
 
       if (hit === null) {
-        zoom.setOffset(init_zoom.x + e.offsetX - init_x, init_zoom.y + e.offsetY - init_y);
+        zoom.setOffset(init_zoom.x + offsetX - init_x, init_zoom.y + offsetY - init_y);
       }
       else {
-        var x = e.offsetX - hit.dx;
-        var y = e.offsetY - hit.dy;
+        var x = offsetX - hit.dx;
+        var y = offsetY - hit.dy;
         if (hit.pt == 4) {
           triangle.setCentre(x, y);
         } else {
