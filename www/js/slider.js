@@ -1,6 +1,4 @@
 function Slider(x, y, opts) {
-  this.x = x;
-  this.y = y;
   this.config = $.extend({},
   {
     width: 200,
@@ -12,6 +10,7 @@ function Slider(x, y, opts) {
   },
   opts);
   this.value = 0;
+  this.setPosition(x, y);
 }
 
 Slider.prototype = new Control();
@@ -22,7 +21,7 @@ $.extend(Slider.prototype, {
   },
 
   posToVal: function(pos) {
-    return pos * (this.config.max - this.config.min) / this.width + this.config.min;
+    return pos * (this.config.max - this.config.min) / this.config.width + this.config.min;
   },
 
   alignAdjust: function() {
@@ -40,7 +39,7 @@ $.extend(Slider.prototype, {
   draw: function(ctx) {
     ctx.save();
 
-    ctx.translate(this.alignAdjust() + this.x, this.y);
+    ctx.translate(this.alignAdjust(), 0);
 
     ctx.lineWidth = 3;
     ctx.strokeStyle = this.config.line_colour;
@@ -65,13 +64,21 @@ $.extend(Slider.prototype, {
     ctx.restore();
   },
 
-  decodeClick: function(x, y) {
+  mouseDown: function(x, y) {
+    x -= this.alignAdjust();
     var cx = this.valToPos(this.value);
-    if (this.inControlCircle(this.x, this.y, x, y)) return {
-      dx: x - this.x,
-      dy: y - this.y,
-      pt: 4
-    };
+    if (this.inControlCircle(cx, 0, x, y)) {
+      this.dragThis(cx + this.alignAdjust(), 0, null);
+    }
+  },
 
+  mouseMove: function(x, y, data) {
+    x -= this.alignAdjust();
+    var nval = this.posToVal(x);
+    this.value = Math.max(this.config.min, Math.min(nval, this.config.max));
+    this.trigger('slide', {
+      value: this.value
+    });
   }
+
 });

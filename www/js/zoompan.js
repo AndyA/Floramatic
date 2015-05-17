@@ -10,9 +10,11 @@ $.extend(ZoomPan.prototype, {
   setupContext: function(ctx) {
     var ccx = this.cw / 2;
     var ccy = this.ch / 2;
+    var size = this.getScaledSize();
     ctx.translate(ccx, ccy);
     ctx.scale(this.scale, this.scale);
     ctx.translate(this.ox - this.iw / 2, this.oy - this.ih / 2);
+    //    ctx.translate(this.ox - size.w / 2, this.oy - size.h / 2);
   },
 
   _sizeUpdated: function() {
@@ -40,8 +42,10 @@ $.extend(ZoomPan.prototype, {
 
   setOffset: function(x, y) {
     var size = this.getScaledSize();
-    var xr = (size.w - this.cw) / 2;
-    var yr = (size.h - this.ch) / 2;
+    //    var xr = (size.w - this.cw) / 2;
+    //    var yr = (size.h - this.ch) / 2;
+    var xr = (this.iw - this.cw) / 2;
+    var yr = (this.ih - this.ch) / 2;
 
     this.ox = Math.max(-xr, Math.min(x, xr));
     this.oy = Math.max(-yr, Math.min(y, yr));

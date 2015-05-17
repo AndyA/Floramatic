@@ -1,5 +1,5 @@
 function Triangle(x, y, r, a) {
-  this.setCentre(x, y);
+  this.setPosition(x, y);
   this.setRadius(r);
   this.setAngle(a);
   this.colours = ['rgb(255, 96, 96)', 'rgb(192, 96, 255)', 'rgb(96, 96, 255)', 'rgb(96, 255, 96)', 'white'];
@@ -9,19 +9,11 @@ function Triangle(x, y, r, a) {
 Triangle.prototype = new Control();
 $.extend(Triangle.prototype, {
 
-  setCentre: function(x, y) {
-    //    console.log('setCentre(' + x + ', ' + y + ')');
-    this.x = x;
-    this.y = y;
-  },
-
   setRadius: function(r) {
-    //    console.log('setRadius(' + r + ')');
     this.r = r;
   },
 
   setAngle: function(a) {
-    //    console.log('setAngle(' + a + ')');
     this.a = a;
   },
 
@@ -41,6 +33,7 @@ $.extend(Triangle.prototype, {
   // Draw the controller triangle
   draw: function(ctx) {
     ctx.save();
+    ctx.translate(-this.x, -this.y);
     ctx.lineWidth = 3;
 
     var corners = this.getCorners();
@@ -79,24 +72,39 @@ $.extend(Triangle.prototype, {
     ctx.restore();
   },
 
-  decodeClick: function(x, y) {
-    if (this.inControlCircle(this.x, this.y, x, y)) return {
-      dx: x - this.x,
-      dy: y - this.y,
-      pt: 4
-    };
+  mouseDown: function(x, y) {
+    if (this.inControlCircle(0, 0, x, y)) {
+      this.dragThis(0, 0, {
+        pt: 4
+      });
+      return;
+    }
 
     var corners = this.getCorners();
     for (var i = 0; i < corners.length; i++) {
       var dot = corners[i];
-      if (this.inControlCircle(dot.x, dot.y, x, y)) return {
-        dx: x - dot.x,
-        dy: y - dot.y,
-        pt: i
-      };
+      if (this.inControlCircle(dot.x - this.x, dot.y - this.y, x, y)) {
+        this.dragThis(dot.x - this.x, dot.y - this.y, {
+          pt: i
+        });
+        return;
+      }
     }
+  },
 
-    return null;
+  mouseMove: function(x, y, data) {
+    if (data.pt == 4) {
+      this.setPosition(this.x + x, this.y + y);
+    } else {
+      var dx = x;
+      var dy = y;
+      if (data.pt == 0 || data.pt == 1) {
+        this.setRadius(Math.sqrt(dx * dx + dy * dy));
+      }
+      if (data.pt == 1 || data.pt == 2) {
+        this.setAngle(Math.PI / 2 - Math.PI * 2 * data.pt / 3 - Math.atan2(dy, dx));
+      }
+    }
   },
 
   cuttingForRadius: function(r) {
