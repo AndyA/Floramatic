@@ -8,6 +8,7 @@
   * save as (big) image
 * make current state bookmarkable
 * FX: invert, vignette
+* Make the controls work on phone / tablet
 
 # Thoughts
 
