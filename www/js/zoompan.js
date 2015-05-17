@@ -20,7 +20,6 @@ $.extend(ZoomPan.prototype, {
   },
 
   setCanvasSize: function(w, h) {
-    console.log("setCanvasSize(" + w + ", " + h + ")");
     this.cw = w;
     this.ch = h;
     this._sizeUpdated();

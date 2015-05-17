@@ -2,11 +2,11 @@ function Triangle(x, y, r, a) {
   this.setCentre(x, y);
   this.setRadius(r);
   this.setAngle(a);
-  this.hs = 10; // handle size
   this.colours = ['rgb(255, 128, 128)', 'rgb(128, 255, 128)', 'rgb(128, 128, 255)', 'white'];
   this.canvas_keeper = new CanvasKeeper();
 }
 
+Triangle.prototype = new Control();
 $.extend(Triangle.prototype, {
 
   setCentre: function(x, y) {
@@ -38,15 +38,8 @@ $.extend(Triangle.prototype, {
     return corners;
   },
 
-  controlCircle: function(ctx, x, y) {
-    ctx.beginPath();
-    ctx.moveTo(x + this.hs, y);
-    ctx.arc(x, y, this.hs, 0, 2 * Math.PI);
-    ctx.stroke();
-  },
-
   // Draw the controller triangle
-  drawController: function(ctx) {
+  draw: function(ctx) {
     ctx.save();
     ctx.lineWidth = 3;
 
@@ -84,12 +77,6 @@ $.extend(Triangle.prototype, {
     }
 
     ctx.restore();
-  },
-
-  inControlCircle: function(cx, cy, x, y) {
-    var dx = x - cx;
-    var dy = y - cy;
-    return dx * dx + dy * dy <= this.hs * this.hs;
   },
 
   decodeClick: function(x, y) {

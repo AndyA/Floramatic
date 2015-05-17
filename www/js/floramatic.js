@@ -16,7 +16,17 @@ $(function() {
   var dst_cvs = $destination[0];
   var dst_ctx = dst_cvs.getContext('2d');
 
+  var controls = new Controls(src_cvs);
   var triangle = null;
+  var slider = new Slider(0, -30, {
+    min: -500,
+    max: 500,
+    width: 200
+  });
+
+  slider.setOrigin(0.5, 1);
+  controls.add(slider);
+
   var zoom = null;
   var image = null;
 
@@ -49,8 +59,7 @@ $(function() {
       triangle.releaseCutting(cutting);
     }
 
-    src_ctx.translate(src_cvs.width / 2, src_cvs.height / 2);
-    triangle.drawController(src_ctx);
+    controls.draw(src_ctx);
 
     dst_ctx.restore();
     src_ctx.restore();
@@ -70,6 +79,7 @@ $(function() {
     if (!triangle) {
       var radius = Math.min(src_cvs.width, src_cvs.height) / 5;
       triangle = new Triangle(0, 0, radius, 0);
+      controls.add(triangle);
     }
     redraw();
   }
@@ -109,8 +119,8 @@ $(function() {
 
     function getOffset(e) {
       return {
-        x: (e.offsetX || e.pageX - $(e.target).offset().left) - src_cvs.width / 2,
-        y: (e.offsetY || e.pageY - $(e.target).offset().top) - src_cvs.height / 2
+        x: (e.offsetX || e.pageX - $(e.target).offset().left),
+        y: (e.offsetY || e.pageY - $(e.target).offset().top)
       }
     }
 
@@ -120,29 +130,33 @@ $(function() {
     var init_y = ofs.y;
     var init_zoom = zoom.getState();
 
-    var hit = triangle.decodeClick(init_x, init_y);
+    //    var hit = triangle.decodeClick(init_x, init_y);
+    var hit = controls.decodeClick(init_x, init_y);
     $source.mousemove(function(e) {
       var ofs = getOffset(e);
-
       if (hit === null) {
         zoom.setOffset(init_zoom.x + ofs.x - init_x, init_zoom.y + ofs.y - init_y);
       }
       else {
-        var x = ofs.x - hit.dx;
-        var y = ofs.y - hit.dy;
-        if (hit.pt == 4) {
-          triangle.setCentre(x, y);
-        } else {
-          var dx = x - triangle.x;
-          var dy = y - triangle.y;
-          triangle.setRadius(Math.sqrt(dx * dx + dy * dy));
-          triangle.setAngle(Math.PI / 2 - Math.PI * 2 * hit.pt / 3 - Math.atan2(dy, dx));
+        if (controls.dragging == triangle) {
+          var cofs = controls.tmpDraggingControlOffset(ofs.x, ofs.y);
+          var x = cofs.x - hit.dx;
+          var y = cofs.y - hit.dy;
+          if (hit.pt == 4) {
+            triangle.setCentre(x, y);
+          } else {
+            var dx = x - triangle.x;
+            var dy = y - triangle.y;
+            triangle.setRadius(Math.sqrt(dx * dx + dy * dy));
+            triangle.setAngle(Math.PI / 2 - Math.PI * 2 * hit.pt / 3 - Math.atan2(dy, dx));
+          }
         }
       }
       redraw();
     });
 
     $('body').mouseup(function(e) {
+      controls.endDrag();
       $source.off('mousemove');
       $(this).off('mouseup');
     });
