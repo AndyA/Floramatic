@@ -4,8 +4,8 @@ $(function() {
   //  var current = "Blue Spikes";
   //  var current = "Deep Blue";
   //  var current = "Hippie";
-  //  var current = "Lilium";
-  var current = "Orange";
+  var current = "Lilium";
+  //  var current = "Orange";
   //  var current = "Purple Rose";
   //  var current = "Red Spikes";
   var $source = $('#source');
@@ -84,6 +84,22 @@ $(function() {
     redraw();
   }
 
+  function loadImage(url) {
+    var $img = $('<img></img>').load(function() {
+      image = $img[0];
+      zoom = new ZoomPan(src_cvs.width, src_cvs.height, image.width, image.height);
+      redraw();
+    }).attr({
+      src: 'art/' + url
+    });
+  }
+
+  function loadRandom(mani) {
+    var keys = Object.keys(mani);
+    var pick = Math.floor(Math.random() * keys.length);
+    loadImage(mani[keys[pick]]);
+  }
+
   $(window).resize(function() {
     resize();
   });
@@ -92,13 +108,7 @@ $(function() {
     url: manifest,
     dataType: 'json'
   }).done(function(mani) {
-    var $img = $('<img></img>').load(function() {
-      image = $img[0];
-      zoom = new ZoomPan(src_cvs.width, src_cvs.height, image.width, image.height);
-      redraw();
-    }).attr({
-      src: 'art/' + mani[current]
-    });
+    loadRandom(mani);
   }).fail(function() {
     console.log("Can't load " + manifest);
   });
@@ -147,7 +157,6 @@ $(function() {
           } else {
             var dx = x - triangle.x;
             var dy = y - triangle.y;
-            console.log(hit.pt);
             if (hit.pt == 0 || hit.pt == 1) {
               triangle.setRadius(Math.sqrt(dx * dx + dy * dy));
             }
