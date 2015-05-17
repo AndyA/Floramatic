@@ -147,8 +147,13 @@ $(function() {
           } else {
             var dx = x - triangle.x;
             var dy = y - triangle.y;
-            triangle.setRadius(Math.sqrt(dx * dx + dy * dy));
-            triangle.setAngle(Math.PI / 2 - Math.PI * 2 * hit.pt / 3 - Math.atan2(dy, dx));
+            console.log(hit.pt);
+            if (hit.pt == 0 || hit.pt == 1) {
+              triangle.setRadius(Math.sqrt(dx * dx + dy * dy));
+            }
+            if (hit.pt == 1 || hit.pt == 2) {
+              triangle.setAngle(Math.PI / 2 - Math.PI * 2 * hit.pt / 3 - Math.atan2(dy, dx));
+            }
           }
         }
       }

@@ -8,7 +8,7 @@ function Slider(x, y, opts) {
     max: 10,
     align: 'centre',
     line_colour: 'white',
-    handle_colour: 'rgb(255, 128, 128)'
+    handle_colour: 'rgb(255, 96, 96)'
   },
   opts);
   this.value = 0;
@@ -67,6 +67,11 @@ $.extend(Slider.prototype, {
 
   decodeClick: function(x, y) {
     var cx = this.valToPos(this.value);
+    if (this.inControlCircle(this.x, this.y, x, y)) return {
+      dx: x - this.x,
+      dy: y - this.y,
+      pt: 4
+    };
 
   }
 });

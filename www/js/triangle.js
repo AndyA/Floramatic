@@ -2,7 +2,7 @@ function Triangle(x, y, r, a) {
   this.setCentre(x, y);
   this.setRadius(r);
   this.setAngle(a);
-  this.colours = ['rgb(255, 128, 128)', 'rgb(128, 255, 128)', 'rgb(128, 128, 255)', 'white'];
+  this.colours = ['rgb(255, 96, 96)', 'rgb(192, 96, 255)', 'rgb(96, 96, 255)', 'white'];
   this.canvas_keeper = new CanvasKeeper();
 }
 
