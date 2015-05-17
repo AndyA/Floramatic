@@ -140,7 +140,7 @@ $.extend(Triangle.prototype, {
     ctx.scale(zoom.scale, zoom.scale);
     ctx.translate((cut.centre_x - ccx) / zoom.scale, (cut.centre_y - ccy) / zoom.scale);
     ctx.rotate(this.a);
-    ctx.translate((zoom.ox - zoom.iw / 2) + (ccx - this.x) / zoom.scale, (zoom.oy - zoom.ih / 2) + (ccy - this.y) / zoom.scale);
+    ctx.translate((zoom.ox - zoom.iw / 2) - this.x / zoom.scale, (zoom.oy - zoom.ih / 2) - this.y / zoom.scale);
 
     ctx.drawImage(img, 0, 0);
 

@@ -49,6 +49,7 @@ $(function() {
       triangle.releaseCutting(cutting);
     }
 
+    src_ctx.translate(src_cvs.width / 2, src_cvs.height / 2);
     triangle.drawController(src_ctx);
 
     dst_ctx.restore();
@@ -68,7 +69,7 @@ $(function() {
     if (zoom) zoom.setCanvasSize(src_cvs.width, src_cvs.height);
     if (!triangle) {
       var radius = Math.min(src_cvs.width, src_cvs.height) / 5;
-      triangle = new Triangle(src_cvs.width / 2, src_cvs.height / 2, radius, 0);
+      triangle = new Triangle(0, 0, radius, 0);
     }
     redraw();
   }
@@ -106,24 +107,29 @@ $(function() {
   $source.mousedown(function(e) {
     if (!zoom) return;
 
-    var offsetX = (e.offsetX || e.pageX - $(e.target).offset().left);
-    var offsetY = (e.offsetY || e.pageY - $(e.target).offset().top);
+    function getOffset(e) {
+      return {
+        x: (e.offsetX || e.pageX - $(e.target).offset().left) - src_cvs.width / 2,
+        y: (e.offsetY || e.pageY - $(e.target).offset().top) - src_cvs.height / 2
+      }
+    }
 
-    var init_x = offsetX;
-    var init_y = offsetY;
+    var ofs = getOffset(e);
+
+    var init_x = ofs.x;
+    var init_y = ofs.y;
     var init_zoom = zoom.getState();
 
     var hit = triangle.decodeClick(init_x, init_y);
     $source.mousemove(function(e) {
-      var offsetX = (e.offsetX || e.pageX - $(e.target).offset().left);
-      var offsetY = (e.offsetY || e.pageY - $(e.target).offset().top);
+      var ofs = getOffset(e);
 
       if (hit === null) {
-        zoom.setOffset(init_zoom.x + offsetX - init_x, init_zoom.y + offsetY - init_y);
+        zoom.setOffset(init_zoom.x + ofs.x - init_x, init_zoom.y + ofs.y - init_y);
       }
       else {
-        var x = offsetX - hit.dx;
-        var y = offsetY - hit.dy;
+        var x = ofs.x - hit.dx;
+        var y = ofs.y - hit.dy;
         if (hit.pt == 4) {
           triangle.setCentre(x, y);
         } else {
