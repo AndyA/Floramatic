@@ -2,7 +2,7 @@ function Triangle(x, y, r, a) {
   this.setCentre(x, y);
   this.setRadius(r);
   this.setAngle(a);
-  this.colours = ['rgb(255, 96, 96)', 'rgb(192, 96, 255)', 'rgb(96, 96, 255)', 'white'];
+  this.colours = ['rgb(255, 96, 96)', 'rgb(192, 96, 255)', 'rgb(96, 96, 255)', 'rgb(96, 255, 96)', 'white'];
   this.canvas_keeper = new CanvasKeeper();
 }
 
@@ -62,7 +62,7 @@ $.extend(Triangle.prototype, {
           ctx.beginPath();
           ctx.moveTo(prev_dot.x + dx, prev_dot.y + dy);
           ctx.lineTo(dot.x - dx, dot.y - dy);
-          ctx.strokeStyle = this.colours[3];
+          ctx.strokeStyle = this.colours[4];
           ctx.stroke();
           break;
         case 1:
