@@ -112,21 +112,6 @@ $.extend(Triangle.prototype, {
     return null;
   },
 
-  path: function(ctx) {
-    var corners = this.getCorners();
-    for (var i = 0; i < corners.length; i++) {
-      var dot = corners[i];
-      if (i == 0) ctx.moveTo(dot.x, dot.y);
-      else ctx.lineTo(dot.x, dot.y);
-    }
-  },
-
-  fill: function(ctx) {
-    ctx.beginPath();
-    this.path(ctx);
-    ctx.fill();
-  },
-
   cuttingForRadius: function(r) {
     var tx = Math.cos(Math.PI / 6) * r;
     var ty = Math.sin(Math.PI / 6) * r;
