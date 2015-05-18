@@ -116,6 +116,7 @@ $.extend(Controls.prototype, {
     var self = this;
 
     $(this.canvas).on('mousedown.canvascontrols', function(e) {
+      if (e.which != 1) return;
       self.stopDrag();
 
       var x = e.pageX - $(e.target).offset().left;

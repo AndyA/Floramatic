@@ -80,6 +80,7 @@ $(function() {
     controls.add(slider);
 
     $source.on('mousedown.main', function(e) {
+      if (e.which != 1) return;
       if (!zoom) return;
 
       var x = e.pageX - $(e.target).offset().left;
@@ -148,7 +149,8 @@ $(function() {
     }
   });
 
-  $destination.mouseup(function(e) {
+  $destination.mousedown(function(e) {
+    if (e.which != 1) return;
     if (triangle) {
       var size = Math.max(dst_cvs.width, dst_cvs.height) * 1.5;
       var canvas = document.createElement('canvas');
