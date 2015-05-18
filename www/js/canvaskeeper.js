@@ -32,7 +32,6 @@ $.extend(CanvasKeeper.prototype, {
       return cvs;
     }
 
-    //    console.log("Creating a " + sw + " x " + sh + " canvas");
     var canvas = document.createElement('canvas');
     canvas.width = sw;
     canvas.height = sh;
