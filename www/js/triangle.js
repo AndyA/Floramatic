@@ -235,6 +235,10 @@ $.extend(Triangle.prototype, {
     ctx.restore();
     this.releaseCutting(cut);
 
+    // Slight kludge - make sure they overlap
+    ncut.width -= 1;
+    ncut.height -= 1;
+
     return ncut;
   },
 
