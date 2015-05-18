@@ -262,32 +262,12 @@ $.extend(Triangle.prototype, {
     ctx.restore();
   },
 
-  expand: function(cut) {
-    var ncut = this.cuttingForRadius(cut.r * 2);
-    var ctx = ncut.image.getContext('2d');
-    ctx.save();
-
-    ctx.translate(ncut.centre_x, ncut.centre_y);
-    ctx.rotate(Math.PI);
-    ctx.drawImage(cut.image, -cut.centre_x, -cut.centre_y);
-
-    for (var i = 0; i < 3; i++) {
-      ctx.save();
-      ctx.rotate(Math.PI * i * 2 / 3);
-      ctx.translate(0, -cut.tri_y);
-      ctx.scale(1, -1);
-      ctx.translate(0, cut.tri_y);
-      ctx.rotate(-Math.PI * i * 2 / 3);
-      ctx.drawImage(cut.image, -cut.centre_x, -cut.centre_y);
-      ctx.restore();
-    }
-
-    ctx.restore();
-
-    // Assume we're done with the context in cut
+  makeImage: function(cut, w, h) {
+    var cvs = document.createElement('canvas');
+    cvs.width = w;
+    cvs.height = h;
+    this.tile(cut, cvs.getContext('2d'), w, h, w / 2, h / 2);
     this.releaseCutting(cut);
-
-    return ncut;
+    return cvs;
   }
-
 });

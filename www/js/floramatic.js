@@ -106,7 +106,7 @@ $(function() {
   }
 
   function setImage(img) {
-    console.log('setImage: ', img);
+    //    console.log('setImage: ', img);
     image = img;
     zoom = new ZoomPan(src_cvs.width, src_cvs.height, img.width, img.height);
     makeControls();
@@ -131,15 +131,6 @@ $(function() {
     resize();
   });
 
-  $.ajax({
-    url: manifest,
-    dataType: 'json'
-  }).done(function(mani) {
-    loadRandom(mani);
-  }).fail(function() {
-    console.log("Can't load " + manifest);
-  });
-
   $source.on('redraw', function(e) {
     redraw();
   }).on('slide', function(e, ui) {
@@ -152,18 +143,42 @@ $(function() {
   $destination.mousedown(function(e) {
     if (e.which != 1) return;
     if (triangle) {
-      var size = Math.max(dst_cvs.width, dst_cvs.height) * 1.5;
-      var canvas = document.createElement('canvas');
-      canvas.width = size;
-      canvas.height = size;
-
       var cutting = triangle.sample(image, zoom);
-      triangle.tile(cutting, canvas.getContext('2d'), canvas.width, canvas.height, canvas.width / 2, canvas.height / 2);
-      triangle.releaseCutting(cutting);
-      setImage(canvas);
+      var size = Math.max(dst_cvs.width, dst_cvs.height) * 1.5;
+      setImage(triangle.makeImage(cutting, size, size));
     }
   });
 
+  $(window).on('keydown', null, 'v', function(e) {
+    var cutting = triangle.sample(image, zoom);
+    var width = 2560;
+    var height = 1920;
+    var img = triangle.makeImage(cutting, width, height);
+    var img_data = img.toDataURL();
+    $('.popup.image img').one('load', function(e) {
+      $(this).parent().fadeIn();
+    }).attr({
+      src: img_data
+    });
+  });
+
+  $('.popup .ctl.close').click(function(e) {
+    if (e.which = 1) {
+      $(this).closest('.popup').fadeOut().find('img.dynamic').attr({
+        src: ""
+      });
+    };
+  });
+
   resize();
+
+  $.ajax({
+    url: manifest,
+    dataType: 'json'
+  }).done(function(mani) {
+    loadRandom(mani);
+  }).fail(function() {
+    console.log("Can't load " + manifest);
+  });
 
 });

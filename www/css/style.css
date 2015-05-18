@@ -23,3 +23,39 @@ body {
 .canvas-wrapper.right {
   margin-left: 10px;
 }
+
+.popup {
+  position: absolute;
+  display: none;
+  z-index: 999;
+  background-color: rgba(0, 0, 0, 0.75);
+}
+
+.popup.image {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.popup.image img {
+  display: block;
+  margin-top: 30px;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: calc(100% - 60px);
+  max-height: calc(100% - 60px);
+}
+
+.popup .controls {
+  position: absolute;
+  background: black;
+  border-radius: 7px;
+  padding: 8px 16px;
+  right: 45px;
+  top: 45px;
+}
+
+.ctl {
+  cursor: pointer;
+}
