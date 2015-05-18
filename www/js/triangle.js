@@ -107,18 +107,35 @@ $.extend(Triangle.prototype, {
     }
   },
 
+  cuttingForRect: function(w, h) {
+    return {
+      image: this.canvas_keeper.getCanvas(w, h),
+      width: w,
+      height: h,
+      centre_x: w / 2,
+      centre_y: h / 2,
+      kind: 'rect'
+    }
+  },
+
   cuttingForRadius: function(r) {
     var tx = Math.cos(Math.PI / 6) * r;
     var ty = Math.sin(Math.PI / 6) * r;
 
-    return {
-      image: this.canvas_keeper.getCanvas(Math.floor(tx * 2 + 2), Math.floor(ty + r + 2)),
-      tri_x: tx,
-      tri_y: ty,
-      centre_x: tx + 1,
-      centre_y: ty + 1,
-      r: r
-    }
+    var cut = this.cuttingForRect(Math.floor(tx * 2 + 2), Math.floor(ty + r + 2));
+
+    cut.tri_x = tx;
+    cut.tri_y = ty;
+    cut.centre_x = tx + 1;
+    cut.centre_y = ty + 1;
+    cut.r = r;
+    cut.kind = 'triangle';
+
+    return cut;
+  },
+
+  releaseCutting: function(cut) {
+    this.canvas_keeper.releaseCanvas(cut.image);
   },
 
   sample: function(img, zoom) {
@@ -158,14 +175,87 @@ $.extend(Triangle.prototype, {
     ctx.lineTo(-tx, -ty);
     ctx.closePath();
     ctx.fill();
+    ctx.strokeStyle = 'black';
+
+    if (0) {
+      ctx.lineWidth = 4;
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.stroke();
+    }
 
     ctx.restore();
 
     return cut;
   },
 
-  releaseCutting: function(cut) {
-    this.canvas_keeper.releaseCanvas(cut.image);
+  makeRect: function(cut) {
+    if (cut.kind == 'rect') return cut;
+
+    var cx = Math.cos(Math.PI / 6) * cut.r;
+    var cy = Math.sin(Math.PI / 6) * cut.r;
+
+    var tw = Math.floor(cx * 2);
+    var th = Math.floor(cy + cut.r);
+
+    var ncut = this.cuttingForRect(tw * 3, th * 2);
+    var ctx = ncut.image.getContext('2d');
+    ctx.save();
+
+    ctx.translate(cut.centre_x - cx, cut.centre_y);
+
+    for (var i = 0; i < 2; i++) {
+      ctx.save();
+      ctx.drawImage(cut.image, -cut.centre_x, -cut.centre_y);
+      for (var j = 0; j < 2; j++) {
+        ctx.rotate(Math.PI * 2 / 3);
+        ctx.translate(0, -cut.tri_y);
+        ctx.scale(1, -1);
+        ctx.translate(0, cut.tri_y);
+        ctx.rotate(-Math.PI * 2 / 3);
+        ctx.drawImage(cut.image, -cut.centre_x, -cut.centre_y);
+
+        ctx.translate(0, -cut.tri_y);
+        ctx.scale(1, -1);
+        ctx.translate(0, cut.tri_y);
+        ctx.drawImage(cut.image, -cut.centre_x, -cut.centre_y);
+
+        ctx.rotate(-Math.PI * 2 / 3);
+        ctx.translate(0, -cut.tri_y);
+        ctx.scale(1, -1);
+        ctx.translate(0, cut.tri_y);
+        ctx.rotate(Math.PI * 2 / 3);
+        ctx.drawImage(cut.image, -cut.centre_x, -cut.centre_y);
+      }
+      ctx.restore();
+      ctx.translate(0, cut.r);
+      ctx.scale(1, -1);
+      ctx.translate(0, -cut.r);
+    }
+
+    ctx.restore();
+    this.releaseCutting(cut);
+
+    return ncut;
+  },
+
+  tile: function(cut, ctx, w, h, xo, yo) {
+    cut = this.makeRect(cut);
+    xo = MathX.fmodp(xo - cut.width / 2, cut.width);
+    yo = MathX.fmodp(yo - cut.height, cut.height);
+
+    var tw = Math.floor((w - xo + 2 * cut.width) / cut.width);
+    var th = Math.floor((h - yo + 2 * cut.height) / cut.height);
+
+    ctx.save();
+
+    ctx.translate(xo - cut.width, yo - cut.height);
+    for (y = 0; y < th; y++) {
+      for (x = 0; x < tw; x++) {
+        ctx.drawImage(cut.image, x * cut.width, y * cut.height);
+      }
+    }
+
+    ctx.restore();
   },
 
   expand: function(cut) {

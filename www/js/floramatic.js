@@ -46,17 +46,28 @@ $(function() {
       src_ctx.restore();
 
       var cutting = triangle.sample(image, zoom);
-      var dim = Math.max(dst_cvs.width, dst_cvs.height) * 1.4;
-
       var rot = 0;
-      while (cutting.r < dim) {
-        cutting = triangle.expand(cutting);
-        rot++;
+
+      if (0) {
+        var dim = Math.max(dst_cvs.width, dst_cvs.height) * 1.4;
+
+        while (cutting.r < dim) {
+          cutting = triangle.expand(cutting);
+          rot++;
+        }
+      }
+      else {
+        cutting = triangle.makeRect(cutting);
       }
 
-      dst_ctx.translate(dst_cvs.width / 2, dst_cvs.height / 2);
-      if (rot % 2) dst_ctx.rotate(Math.PI);
-      dst_ctx.drawImage(cutting.image, -cutting.centre_x, -cutting.centre_y);
+      if (0) {
+        dst_ctx.translate(dst_cvs.width / 2, dst_cvs.height / 2);
+        if (rot % 2) dst_ctx.rotate(Math.PI);
+        dst_ctx.drawImage(cutting.image, -cutting.centre_x, -cutting.centre_y);
+      }
+      else {
+        triangle.tile(cutting, dst_ctx, dst_cvs.width, dst_cvs.height, dst_cvs.width / 2, dst_cvs.height / 2);
+      }
       triangle.releaseCutting(cutting);
     }
 
