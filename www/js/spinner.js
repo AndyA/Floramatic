@@ -1,12 +1,19 @@
 function Spinner(elt) {
   this.elt = elt;
+
+  this.config = {
+    throb_min: 15,
+    throb_max: 30,
+    throb_step: 0.2,
+    rot_step: 0.05,
+    in_rate: 0.05,
+    out_rate: 0.1,
+    tick_time: 20
+  };
+
   this.colours = ['rgb(255, 96, 96)', 'rgb(192, 96, 255)', 'rgb(96, 96, 255)', 'rgb(96, 255, 96)', 'white'];
   this.rot_angle = 0;
   this.throb_angle = 0;
-  this.throb = {
-    min: 10,
-    max: 30
-  };
   this.running = 0;
   this.opacity = -0.5;
 }
@@ -37,7 +44,7 @@ $.extend(Spinner.prototype, {
     if (this.opacity < 0) return;
     var cvs = $(this.elt).find('canvas')[0];
     var ctx = cvs.getContext('2d');
-    var sz = Math.min(cvs.width, cvs.height) / 2 - this.throb.max - 2;
+    var sz = Math.min(cvs.width, cvs.height) / 2 - this.config.throb_max - 2;
 
     ctx.save();
     ctx.clearRect(0, 0, cvs.width, cvs.height);
@@ -45,35 +52,48 @@ $.extend(Spinner.prototype, {
     ctx.lineWidth = 6;
     ctx.globalAlpha = this.opacity;
 
-    var corners = this.getCorners(sz);
-    var cr = Math.sin(this.throb_angle) * (this.throb.max - this.throb.min) / 2 + (this.throb.min + this.throb.max) / 2;
+    var throb_scale = (this.config.throb_max - this.config.throb_min) / 2;
+    var throb_origin = (this.config.throb_max + this.config.throb_min) / 2;
+
+    var dots = this.getCorners(sz);
 
     for (var pass = 0; pass < 2; pass++) {
-      var prev_dot = corners[corners.length - 1];
-      var a = this.rot_angle;
+      var prev_dot, prev_throb;;
 
-      for (var i = 0; i < corners.length; i++) {
-        var dot = corners[i];
+      var ra = this.rot_angle;
+      var ta = this.throb_angle;
 
-        var dx = Math.sin(a + Math.PI / 6) * cr;
-        var dy = Math.cos(a + Math.PI / 6) * cr;
+      for (var i = 0; i < dots.length + 1; i++) {
+        var ii = i % dots.length;
 
-        switch (pass) {
-        case 0:
-          ctx.beginPath();
-          ctx.moveTo(prev_dot.x + dx, prev_dot.y + dy);
-          ctx.lineTo(dot.x - dx, dot.y - dy);
-          ctx.strokeStyle = this.colours[4];
-          ctx.stroke();
-          break;
-        case 1:
-          ctx.strokeStyle = this.colours[i];
-          this.drawCircle(ctx, dot.x, dot.y, cr);
-          break;
+        var dot = dots[ii];
+
+        var dx = Math.sin(ra + Math.PI / 6);
+        var dy = Math.cos(ra + Math.PI / 6);
+
+        var throb = Math.sin(ta) * throb_scale + throb_origin;;
+
+        if (i) {
+          switch (pass) {
+          case 0:
+            ctx.beginPath();
+            ctx.moveTo(prev_dot.x + dx * prev_throb, prev_dot.y + dy * prev_throb);
+            ctx.lineTo(dot.x - dx * throb, dot.y - dy * throb);
+            ctx.strokeStyle = this.colours[4];
+            ctx.stroke();
+            break;
+          case 1:
+            ctx.strokeStyle = this.colours[ii];
+            this.drawCircle(ctx, dot.x, dot.y, throb);
+            break;
+          }
         }
 
         prev_dot = dot;
-        a += Math.PI * 2 / 3;
+        prev_throb = throb;
+
+        ra += Math.PI * 2 / 3;
+        ta += Math.PI * 2 / 3;
       }
     }
 
@@ -82,8 +102,8 @@ $.extend(Spinner.prototype, {
 
   next: function() {
     this.draw();
-    this.rot_angle -= 0.05;
-    this.throb_angle += 0.2;
+    this.rot_angle = MathX.fmodp(this.rot_angle + this.config.rot_step, Math.PI * 2);
+    this.throb_angle = MathX.fmodp(this.throb_angle + this.config.throb_step, Math.PI * 2);
   },
 
   start: function() {
@@ -94,12 +114,12 @@ $.extend(Spinner.prototype, {
         self.next();
         if (self.running || self.opacity > 0) {
           if (self.running) {
-            if (self.opacity < 1) self.opacity = Math.min(self.opacity + 0.05, 1);
+            if (self.opacity < 1) self.opacity = Math.min(self.opacity + self.config.in_rate, 1);
           }
           else {
-            if (self.opacity > 0) self.opacity = Math.max(self.opacity - 0.1, -0.5);
+            if (self.opacity > 0) self.opacity = Math.max(self.opacity - self.config.out_rate, -0.5);
           }
-          setTimeout(tick, 20);
+          setTimeout(tick, self.config.tick_time);
         }
         else {
           self.opacity = -0.5;
