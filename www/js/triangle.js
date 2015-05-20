@@ -109,7 +109,7 @@ $.extend(Triangle.prototype, {
 
   cuttingForRect: function(w, h) {
     return {
-      image: this.canvas_keeper.getCanvas(w, h),
+      image: this.canvas_keeper.getCanvas(Math.floor(w + 2), Math.floor(h + 2)),
       width: w,
       height: h,
       centre_x: w / 2,
@@ -194,8 +194,8 @@ $.extend(Triangle.prototype, {
     var cx = Math.cos(Math.PI / 6) * cut.r;
     var cy = Math.sin(Math.PI / 6) * cut.r;
 
-    var tw = Math.floor(cx * 2);
-    var th = Math.floor(cy + cut.r);
+    var tw = cx * 2;
+    var th = cy + cut.r;
 
     var ncut = this.cuttingForRect(tw * 3, th * 2);
     var ctx = ncut.image.getContext('2d');
@@ -234,10 +234,6 @@ $.extend(Triangle.prototype, {
 
     ctx.restore();
     this.releaseCutting(cut);
-
-    // Slight kludge - make sure they overlap
-    ncut.width -= 1;
-    ncut.height -= 1;
 
     return ncut;
   },
