@@ -6,6 +6,8 @@ function Triangle(x, y, r, a) {
   this.canvas_keeper = new CanvasKeeper();
 }
 
+Triangle.MIN_TILE = 256;
+
 Triangle.prototype = new Control();
 $.extend(Triangle.prototype, {
 
@@ -238,11 +240,7 @@ $.extend(Triangle.prototype, {
     return ncut;
   },
 
-  tile: function(cut, ctx, w, h, xo, yo) {
-    cut = this.makeRect(cut);
-    xo = MathX.fmodp(xo - cut.width / 2, cut.width);
-    yo = MathX.fmodp(yo - cut.height, cut.height);
-
+  rawTile: function(cut, ctx, w, h, xo, yo) {
     var tw = Math.floor((w - xo + 2 * cut.width) / cut.width);
     var th = Math.floor((h - yo + 2 * cut.height) / cut.height);
 
@@ -256,6 +254,24 @@ $.extend(Triangle.prototype, {
     }
 
     ctx.restore();
+  },
+
+  tile: function(cut, ctx, w, h, xo, yo) {
+    cut = this.makeRect(cut);
+
+    if ((cut.width < w && cut.width < Triangle.MIN_TILE) || (cut.height < h && cut.height < Triangle.MIN_TILE)) {
+      var tw = Math.floor(Triangle.MIN_TILE / cut.width + 1) * cut.width;
+      var th = Math.floor(Triangle.MIN_TILE / cut.height + 1) * cut.height;
+      var ncut = this.cuttingForRect(tw, th);
+      var nctx = ncut.image.getContext('2d');
+      this.rawTile(cut, nctx, tw, th, 0, 0);
+      this.rawTile(ncut, ctx, w, h, MathX.fmodp(xo - cut.width / 2, tw), MathX.fmodp(yo - cut.height, th));
+      this.releaseCutting(ncut);
+    }
+    else {
+      this.rawTile(cut, ctx, w, h, MathX.fmodp(xo - cut.width / 2, cut.width), MathX.fmodp(yo - cut.height, cut.height));
+    }
+
   },
 
   makeImage: function(cut, w, h) {
