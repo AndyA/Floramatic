@@ -64,6 +64,7 @@ $(function() {
 
   function makeControls() {
     $source.off('mousedown.main'); // if reloading
+    if (controls) controls.destroy();
     controls = new Controls(src_cvs);
 
     var radius = Math.min(src_cvs.width, src_cvs.height) / 5;
@@ -106,7 +107,6 @@ $(function() {
   }
 
   function setImage(img) {
-    //    console.log('setImage: ', img);
     image = img;
     zoom = new ZoomPan(src_cvs.width, src_cvs.height, img.width, img.height);
     makeControls();

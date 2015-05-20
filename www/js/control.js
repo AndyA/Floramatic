@@ -157,6 +157,10 @@ $.extend(Controls.prototype, {
     });
   },
 
+  destroy: function() {
+    $(this.canvas).off('.canvascontrols');
+  },
+
   trigger: function(ev, ui) {
     $(this.canvas).trigger(ev, ui);
   },
