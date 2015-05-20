@@ -19,6 +19,8 @@ $(function() {
   var controls = null;
   var triangle = null;
   var slider = null;
+  var spinner = new Spinner($('.spinner')[0]);
+  spinner.start();
 
   var zoom = null;
   var image = null;
@@ -112,8 +114,10 @@ $(function() {
   }
 
   function loadImage(url) {
+    spinner.start();
     var $img = $('<img></img>').load(function() {
       setImage($img[0]);
+      spinner.stop();
     }).attr({
       src: 'art/' + url
     });
@@ -148,13 +152,15 @@ $(function() {
   });
 
   $(window).on('keydown', null, 'v', function(e) {
+    spinner.start();
     var cutting = triangle.sample(image, zoom);
     var width = 2560;
-    var height = 1920;
+    var height = 1440;
     var img = triangle.makeImage(cutting, width, height);
     var img_data = img.toDataURL();
     $('.popup.image img').one('load', function(e) {
       $(this).parent().fadeIn();
+      spinner.stop();
     }).attr({
       src: img_data
     });
@@ -175,6 +181,7 @@ $(function() {
     dataType: 'json'
   }).done(function(mani) {
     loadRandom(mani);
+    spinner.stop();
   }).fail(function() {
     console.log("Can't load " + manifest);
   });

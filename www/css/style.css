@@ -60,3 +60,13 @@ body {
 .ctl {
   cursor: pointer;
 }
+
+.spinner {
+  position: absolute;
+  display: none;
+  z-index: 9999;
+  width: 256px;
+  height: 256px;
+  left: calc(50vw - 128px);
+  top: calc(50vh - 128px);
+}
