@@ -1,13 +1,16 @@
 function CanvasKeeper() {
   this.cache = {};
-  this.base = 1.2;
+  this.base = 1.4;
   this.log_b = Math.log(this.base);
 }
+
+CanvasKeeper.MIN_SIZE = 64;
 
 $.extend(CanvasKeeper.prototype, {
 
   seriesSnap: function(x) {
-    return Math.floor(Math.pow(this.base, Math.floor(Math.log(x) / this.log_b) + 1))
+    var snapped = Math.floor(Math.pow(this.base, Math.floor(Math.log(x) / this.log_b) + 1));
+    return Math.max(snapped, CanvasKeeper.MIN_SIZE);
   },
 
   hashSlot: function(w, h) {

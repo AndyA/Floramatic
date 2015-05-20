@@ -271,7 +271,7 @@ $.extend(Triangle.prototype, {
     else {
       this.rawTile(cut, ctx, w, h, MathX.fmodp(xo - cut.width / 2, cut.width), MathX.fmodp(yo - cut.height, cut.height));
     }
-
+    this.releaseCutting(cut);
   },
 
   makeImage: function(cut, w, h) {
@@ -279,7 +279,6 @@ $.extend(Triangle.prototype, {
     cvs.width = w;
     cvs.height = h;
     this.tile(cut, cvs.getContext('2d'), w, h, w / 2, h / 2);
-    this.releaseCutting(cut);
     return cvs;
   }
 });
