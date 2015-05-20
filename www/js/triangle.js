@@ -190,20 +190,10 @@ $.extend(Triangle.prototype, {
     return cut;
   },
 
-  makeRect: function(cut) {
-    if (cut.kind == 'rect') return cut;
-
-    var cx = Math.cos(Math.PI / 6) * cut.r;
-    var cy = Math.sin(Math.PI / 6) * cut.r;
-
-    var tw = cx * 2;
-    var th = cy + cut.r;
-
-    var ncut = this.cuttingForRect(tw * 3, th * 2);
-    var ctx = ncut.image.getContext('2d');
+  rawRect: function(cut, ctx) {
     ctx.save();
 
-    ctx.translate(cut.centre_x - cx, cut.centre_y);
+    ctx.translate(cut.centre_x - cut.tri_x, cut.centre_y);
 
     for (var i = 0; i < 2; i++) {
       ctx.save();
@@ -235,12 +225,26 @@ $.extend(Triangle.prototype, {
     }
 
     ctx.restore();
+  },
+
+  makeRect: function(cut) {
+    if (cut.kind == 'rect') return cut;
+
+    var tw = cut.tri_x * 2;
+    var th = cut.tri_y + cut.r;
+
+    var ncut = this.cuttingForRect(tw * 3, th * 2);
+    var ctx = ncut.image.getContext('2d');
+    this.rawRect(cut, ctx);
     this.releaseCutting(cut);
 
     return ncut;
   },
 
   rawTile: function(cut, ctx, w, h, xo, yo) {
+    if (xo == 0) xo = cut.width;
+    if (yo == 0) yo = cut.height;
+
     var tw = Math.floor((w - xo + 2 * cut.width) / cut.width);
     var th = Math.floor((h - yo + 2 * cut.height) / cut.height);
 
