@@ -151,7 +151,7 @@ $(function() {
     }
   });
 
-  $(window).on('keydown', null, 'v', function(e) {
+  function showViewer() {
     spinner.start();
     var cutting = triangle.sample(image, zoom);
     var width = 2560;
@@ -164,14 +164,28 @@ $(function() {
     }).attr({
       src: img_data
     });
+  }
+
+  function hidePopup($elt) {
+    if ($elt.length) {
+      $elt.fadeOut().find('img.dynamic').attr({
+        src: ""
+      });
+    }
+  }
+
+  $(window).on('keydown', null, 'v', function(e) {
+    showViewer();
+  }).on('keydown', null, 'esc', function(e) {
+    hidePopup($('.popup:visible'));
   });
 
   $('.popup .ctl.close').click(function(e) {
-    if (e.which = 1) {
-      $(this).closest('.popup').fadeOut().find('img.dynamic').attr({
-        src: ""
-      });
-    };
+    if (e.which = 1) hidePopup($(this).closest('.popup'));
+  });
+
+  $('.ctl.viewer').click(function(e) {
+    showViewer();
   });
 
   resize();
