@@ -119,14 +119,14 @@ $(function() {
       setImage($img[0]);
       spinner.stop();
     }).attr({
-      src: 'art/' + url
+      src: url
     });
   }
 
   function loadRandom(mani) {
     var keys = Object.keys(mani);
     var pick = Math.floor(Math.random() * keys.length);
-    loadImage(mani[keys[pick]]);
+    loadImage('art/' + mani[keys[pick]]);
   }
 
   $(window).resize(function() {
@@ -142,7 +142,7 @@ $(function() {
     }
   });
 
-  $destination.mousedown(function(e) {
+  $destination.click(function(e) {
     if (e.which != 1) return;
     if (triangle) {
       var cutting = triangle.sample(image, zoom);
@@ -184,6 +184,34 @@ $(function() {
     spinner.stop();
   }).fail(function() {
     console.log("Can't load " + manifest);
+  });
+
+  // Drag & drop image
+  $(window).on('dragenter', function(e) {
+    e.stopPropagation();
+    e.preventDefault();
+  });
+
+  $(window).on('dragover', function(e) {
+    e.stopPropagation();
+    e.preventDefault();
+  });
+
+  $(window).on('drop', function(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    var files = e.originalEvent.dataTransfer.files;
+    var imageType = /^image\//;
+    for (var i = 0; i < files.length; i++) {
+      var file = files[i];
+      if (!imageType.test(file.type)) continue;
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        loadImage(e.target.result);
+      };
+      reader.readAsDataURL(file);
+      break; // first image only
+    }
   });
 
 });
