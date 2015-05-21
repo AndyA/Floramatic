@@ -5,7 +5,7 @@ function Spinner(elt) {
     throb_min: 15,
     throb_max: 30,
     throb_step: 0.2,
-    rot_step: -0.05,
+    rot_step: 0.05,
     in_rate: 0.05,
     out_rate: 0.1,
     tick_time: 20
