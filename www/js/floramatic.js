@@ -1,13 +1,7 @@
 $(function() {
 
   var manifest = 'art/manifest.json';
-  //  var current = "Blue Spikes";
-  //  var current = "Deep Blue";
-  //  var current = "Hippie";
-  var current = "Lilium";
-  //  var current = "Orange";
-  //  var current = "Purple Rose";
-  //  var current = "Red Spikes";
+
   var $source = $('#source');
   var src_cvs = $source[0];
   var src_ctx = src_cvs.getContext('2d');
@@ -16,14 +10,21 @@ $(function() {
   var dst_cvs = $destination[0];
   var dst_ctx = dst_cvs.getContext('2d');
 
+  var quantiser = new Quantiser({
+    quant_angle: Math.PI / 12,
+    quant_radius: 1.2,
+    quant_distance: 16
+  });
+
   var controls = null;
   var triangle = null;
   var slider = null;
-  var spinner = new Spinner($('.spinner')[0]);
-  spinner.start();
 
   var zoom = null;
   var image = null;
+
+  var spinner = new Spinner($('.spinner')[0]);
+  spinner.start();
 
   function redraw() {
     src_ctx.save();
@@ -62,13 +63,15 @@ $(function() {
     redraw();
   }
 
-  function makeControls() {
+  function makeControls(zoom) {
     $source.off('mousedown.main'); // if reloading
     if (controls) controls.destroy();
-    controls = new Controls(src_cvs);
+    controls = new Controls(src_cvs, {
+      quantiser: quantiser
+    });
 
     var radius = Math.min(src_cvs.width, src_cvs.height) / 5;
-    triangle = new Triangle(0, 0, radius, 0);
+    triangle = new Triangle(0, 0, radius, 0, zoom);
     controls.add(triangle);
 
     slider = new Slider(0, -30, {
@@ -94,7 +97,13 @@ $(function() {
       $source.mousemove(function(e) {
         var x = e.pageX - $(e.target).offset().left;
         var y = e.pageY - $(e.target).offset().top;
-        zoom.setOffset(init_zoom.x + (x - init_x) / init_zoom.scale, init_zoom.y + (y - init_y) / init_zoom.scale);
+        var nx = init_zoom.x + (x - init_x);
+        var ny = init_zoom.y + (y - init_y);
+        if (Modifiers.down('shift')) {
+          nx = quantiser.quantiseDistance(nx);
+          ny = quantiser.quantiseDistance(ny);
+        }
+        zoom.setOffset(nx / init_zoom.scale, ny / init_zoom.scale);
         controls.redraw();
       });
 
@@ -109,7 +118,7 @@ $(function() {
   function setImage(img) {
     image = img;
     zoom = new ZoomPan(src_cvs.width, src_cvs.height, img.width, img.height);
-    makeControls();
+    makeControls(zoom);
     redraw();
   }
 
@@ -128,28 +137,6 @@ $(function() {
     var pick = Math.floor(Math.random() * keys.length);
     loadImage('art/' + mani[keys[pick]]);
   }
-
-  $(window).resize(function() {
-    resize();
-  });
-
-  $source.on('redraw', function(e) {
-    redraw();
-  }).on('slide', function(e, ui) {
-    if (zoom) {
-      var scale = Math.pow(2, ui.value / 100);
-      zoom.setScale(scale);
-    }
-  });
-
-  $destination.click(function(e) {
-    if (e.which != 1) return;
-    if (triangle) {
-      var cutting = triangle.sample(image, zoom);
-      var size = Math.max(dst_cvs.width, dst_cvs.height) * 1.5;
-      setImage(triangle.makeImage(cutting, size, size));
-    }
-  });
 
   function showViewer() {
     spinner.start();
@@ -178,6 +165,28 @@ $(function() {
     showViewer();
   }).on('keydown', null, 'esc', function(e) {
     hidePopup($('.popup:visible'));
+  });
+
+  $(window).resize(function() {
+    resize();
+  });
+
+  $source.on('redraw', function(e) {
+    redraw();
+  }).on('slide', function(e, ui) {
+    if (zoom) {
+      var scale = Math.pow(2, ui.value / 100);
+      zoom.setScale(scale);
+    }
+  });
+
+  $destination.click(function(e) {
+    if (e.which != 1) return;
+    if (triangle) {
+      var cutting = triangle.sample(image, zoom);
+      var size = Math.max(dst_cvs.width, dst_cvs.height) * 1.5;
+      setImage(triangle.makeImage(cutting, size, size));
+    }
   });
 
   $('.popup .ctl.close').click(function(e) {

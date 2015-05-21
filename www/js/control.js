@@ -46,10 +46,18 @@ $.extend(Control.prototype, {
     this.controls.trigger.apply(this.controls, args);
   },
 
+  getQuantiser: function() {
+    return this.controls.options.quantiser;
+  }
+
 });
 
-function Controls(canvas) {
+function Controls(canvas, opts) {
   this.canvas = canvas;
+  this.options = $.extend({},
+  {},
+  opts);
+  if (!this.options.quantiser) this.options.quantiser = new Quantiser();
   this.init();
 }
 
