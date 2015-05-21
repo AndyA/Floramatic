@@ -16,6 +16,8 @@ $(function() {
     quant_distance: 16
   });
 
+  var zoom_rate = 1.7;
+
   var controls = null;
   var triangle = null;
   var slider = null;
@@ -77,7 +79,7 @@ $(function() {
     slider = new Slider(0, -30, {
       min: -500,
       max: 500,
-      width: 200
+      width: 300
     });
     slider.setOrigin(0.5, 1);
 
@@ -175,7 +177,7 @@ $(function() {
     redraw();
   }).on('slide', function(e, ui) {
     if (zoom) {
-      var scale = Math.pow(2, ui.value / 100);
+      var scale = Math.pow(zoom_rate, ui.value / 100);
       zoom.setScale(scale);
     }
   });

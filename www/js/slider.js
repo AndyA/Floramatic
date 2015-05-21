@@ -74,8 +74,8 @@ $.extend(Slider.prototype, {
 
   mouseMove: function(x, y, data) {
     x -= this.alignAdjust();
+    if (Modifiers.down('shift')) x = this.getQuantiser().quantiseDistance(x);
     var nval = Math.max(this.config.min, Math.min(this.posToVal(x), this.config.max));
-    if (Modifiers.down('shift')) nval = this.getQuantiser().quantiseDistance(nval);
     this.value = nval;
     this.trigger('slide', {
       value: this.value
