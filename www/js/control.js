@@ -1,7 +1,7 @@
 function Control() {
   this.metrics = {
-    handle_size: 10,
-    line_width: 3
+    handle_size: 15,
+    line_width: 4.5
   };
   this.setOrigin(0.5, 0.5);
   this.controls = null;
