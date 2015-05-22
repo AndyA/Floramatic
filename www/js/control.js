@@ -58,13 +58,14 @@ $.extend(Control.prototype, {
 function Controls(canvas, opts) {
   this.canvas = canvas;
   this.options = $.extend({},
-  {},
+  {
+    own_handlers: true
+  },
   opts);
   if (!this.options.quantiser) this.options.quantiser = new Quantiser();
   this.init();
 }
 
-// TODO control set, handle drawing, hit test - etc.
 $.extend(Controls.prototype, {
 
   stopDrag: function() {
@@ -86,6 +87,10 @@ $.extend(Controls.prototype, {
     };
   },
 
+  inDrag: function() {
+    return !! this.drag_ctx;
+  },
+
   lock: function() {
     this.locked++;
   },
@@ -103,54 +108,59 @@ $.extend(Controls.prototype, {
     this.unlock();
   },
 
+  mouseDown: function(e) {
+    this.stopDrag();
+
+    var x = e.pageX - $(e.target).offset().left;
+    var y = e.pageY - $(e.target).offset().top;
+
+    for (var i = 0; i < this.controls.length; i++) {
+      var ctl = this.controls[i];
+
+      var cx = x - (this.canvas.width * ctl.origin_x + ctl.x);
+      var cy = y - (this.canvas.height * ctl.origin_y + ctl.y);
+
+      ctl.mouseDown(cx, cy);
+
+      if (this.drag_ctx) {
+        var ctx = this.drag_ctx;
+        ctx.dx = ctx.x - cx;
+        ctx.dy = ctx.y - cy;
+        var self = this;
+
+        $(this.canvas).on('mousemove.canvascontrols', function(e) {
+          var x = e.pageX - $(e.target).offset().left;
+          var y = e.pageY - $(e.target).offset().top;
+
+          var cx = x - (self.canvas.width * ctx.ctl.origin_x + ctx.ctl.x) + ctx.dx;
+          var cy = y - (self.canvas.height * ctx.ctl.origin_y + ctx.ctl.y) + ctx.dy;
+
+          ctx.ctl.mouseMove(cx, cy, ctx.data);
+          self.redraw();
+        });
+
+        $('body').on('mouseup.canvascontrols', function(e) {
+          self.stopDrag();
+        });
+
+        return true;
+      }
+    }
+    return false;
+  },
+
   init: function() {
     this.controls = [];
     this.drag_ctx = null;
     this.locked = 0;
     this.redraw_pending = 0;
 
-    var self = this;
-
-    $(this.canvas).on('mousedown.canvascontrols', function(e) {
-      if (e.which != 1) return;
-      self.stopDrag();
-
-      var x = e.pageX - $(e.target).offset().left;
-      var y = e.pageY - $(e.target).offset().top;
-
-      for (var i = 0; i < self.controls.length; i++) {
-        var ctl = self.controls[i];
-
-        var cx = x - (self.canvas.width * ctl.origin_x + ctl.x);
-        var cy = y - (self.canvas.height * ctl.origin_y + ctl.y);
-
-        ctl.mouseDown(cx, cy);
-
-        if (self.drag_ctx) {
-          var ctx = self.drag_ctx;
-          ctx.dx = ctx.x - cx;
-          ctx.dy = ctx.y - cy;
-
-          $(self.canvas).on('mousemove.canvascontrols', function(e) {
-            var x = e.pageX - $(e.target).offset().left;
-            var y = e.pageY - $(e.target).offset().top;
-
-            var cx = x - (self.canvas.width * ctx.ctl.origin_x + ctx.ctl.x) + ctx.dx;
-            var cy = y - (self.canvas.height * ctx.ctl.origin_y + ctx.ctl.y) + ctx.dy;
-
-            ctx.ctl.mouseMove(cx, cy, ctx.data);
-            self.redraw();
-          });
-
-          $('body').on('mouseup.canvascontrols', function(e) {
-            self.stopDrag();
-          });
-
-          e.stopImmediatePropagation();
-          break;
-        }
-      }
-    });
+    if (this.options.own_handlers) {
+      var self = this;
+      $(this.canvas).on('mousedown.canvascontrols', function(e) {
+        if (e.which == 1 && self.mouseDown(e)) e.stopImmediatePropagation();
+      });
+    }
   },
 
   destroy: function() {
