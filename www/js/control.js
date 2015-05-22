@@ -1,5 +1,8 @@
-function Control(opts) {
-  this.hs = 10; // handle size
+function Control() {
+  this.metrics = {
+    handle_size: 10,
+    line_width: 3
+  };
   this.setOrigin(0.5, 0.5);
   this.controls = null;
 }
@@ -30,15 +33,15 @@ $.extend(Control.prototype, {
 
   controlCircle: function(ctx, x, y) {
     ctx.beginPath();
-    ctx.moveTo(x + this.hs, y);
-    ctx.arc(x, y, this.hs, 0, 2 * Math.PI);
+    ctx.moveTo(x + this.metrics.handle_size, y);
+    ctx.arc(x, y, this.metrics.handle_size, 0, 2 * Math.PI);
     ctx.stroke();
   },
 
   inControlCircle: function(cx, cy, x, y) {
     var dx = x - cx;
     var dy = y - cy;
-    return dx * dx + dy * dy <= this.hs * this.hs;
+    return dx * dx + dy * dy <= this.metrics.handle_size * this.metrics.handle_size;
   },
 
   trigger: function() {
@@ -81,21 +84,6 @@ $.extend(Controls.prototype, {
       y: y,
       data: data
     };
-  },
-
-  crossHair: function(x, y, style) {
-    var ctx = this.canvas.getContext('2d');
-    ctx.save();
-    ctx.strokeStyle = style;
-    ctx.lineWidth = 4;
-    ctx.translate(x, y);
-    ctx.beginPath();
-    ctx.moveTo(0, -30);
-    ctx.lineTo(0, 30);
-    ctx.moveTo(-30, 0);
-    ctx.lineTo(30, 0);
-    ctx.stroke();
-    ctx.restore();
   },
 
   lock: function() {

@@ -41,19 +41,19 @@ $.extend(Slider.prototype, {
 
     ctx.translate(this.alignAdjust(), 0);
 
-    ctx.lineWidth = 3;
+    ctx.lineWidth = this.metrics.line_width;
     ctx.strokeStyle = this.config.line_colour;
 
     ctx.beginPath();
     var cx = this.valToPos(this.value);
 
-    if (cx > this.hs) {
+    if (cx > this.metrics.handle_size) {
       ctx.moveTo(0, 0);
-      ctx.lineTo(cx - this.hs, 0);
+      ctx.lineTo(cx - this.metrics.handle_size, 0);
     }
 
-    if (cx < this.config.width - this.hs) {
-      ctx.moveTo(cx + this.hs, 0);
+    if (cx < this.config.width - this.metrics.handle_size) {
+      ctx.moveTo(cx + this.metrics.handle_size, 0);
       ctx.lineTo(this.config.width, 0);
     }
 

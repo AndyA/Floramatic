@@ -43,7 +43,7 @@ $.extend(Triangle.prototype, {
   draw: function(ctx) {
     ctx.save();
     ctx.translate(-this.x, -this.y);
-    ctx.lineWidth = 3;
+    ctx.lineWidth = this.metrics.line_width;
 
     var corners = this.getCorners();
 
@@ -56,8 +56,8 @@ $.extend(Triangle.prototype, {
       for (var i = 0; i < corners.length; i++) {
         var dot = corners[i];
 
-        var dx = Math.sin(a + Math.PI / 6) * this.hs
-        var dy = Math.cos(a + Math.PI / 6) * this.hs;
+        var dx = Math.sin(a + Math.PI / 6) * this.metrics.handle_size
+        var dy = Math.cos(a + Math.PI / 6) * this.metrics.handle_size;
 
         switch (pass) {
         case 0:
@@ -202,12 +202,6 @@ $.extend(Triangle.prototype, {
     ctx.closePath();
     ctx.fill();
     ctx.strokeStyle = 'black';
-
-    if (0) {
-      ctx.lineWidth = 4;
-      ctx.globalCompositeOperation = 'source-over';
-      ctx.stroke();
-    }
 
     ctx.restore();
 
