@@ -119,7 +119,7 @@ $.extend(Triangle.prototype, {
         var r = Math.sqrt(dx * dx + dy * dy);
         if (snap) {
           var sc = this.zoom.scale;
-          r = quantiser.quantiseWorldDistance(r, this.zoom.scale);
+          r = quantiser.quantiseScaledDistance(r, this.zoom.scale);
         }
         this.setRadius(r);
       }
