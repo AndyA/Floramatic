@@ -19,7 +19,7 @@ Triangle.prototype = new Control();
 $.extend(Triangle.prototype, {
 
   setRadius: function(r) {
-    this.r = r;
+    this.r = Math.max(r, this.metrics.handle_size / 2);
   },
 
   setAngle: function(a) {
