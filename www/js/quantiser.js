@@ -2,7 +2,6 @@ function Quantiser(opts) {
   this.options = $.extend({},
   {
     quant_angle: Math.PI / 12,
-    quant_radius: 1.2,
     quant_distance: 16
   },
   opts);
