@@ -14,13 +14,17 @@ $.extend(Quantiser.prototype, {
     return qa * Math.round(MathX.fmodp(a, Math.PI * 2) / qa);
   },
 
-  quantiseRadius: function(r) {
-    var qr = this.options.quant_radius;
-    return Math.pow(qr, Math.round(Math.log(r) / Math.log(qr)));
+  quantiseWorldDistance: function(d, scale) {
+    var l2s = Math.round(Math.log(scale) / Math.log(2));
+    var qd = this.options.quant_distance / Math.pow(2, l2s);
+    return qd * Math.round(d / qd);
+  },
+
+  quantiseScaledDistance: function(d, scale) {
+    return scale * this.quantiseWorldDistance(d / scale, scale);
   },
 
   quantiseDistance: function(d) {
-    var qd = this.options.quant_distance;
-    return qd * Math.round(d / qd);
-  }
+    return this.quantiseWorldDistance(d, 1);
+  },
 });

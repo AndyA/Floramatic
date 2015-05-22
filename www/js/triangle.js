@@ -108,8 +108,9 @@ $.extend(Triangle.prototype, {
       var nx = this.x + x;
       var ny = this.y + y;
       if (snap) {
-        nx = quantiser.quantiseDistance(nx);
-        ny = quantiser.quantiseDistance(ny);
+        var sc = this.zoom.scale;
+        nx = quantiser.quantiseScaledDistance(nx, sc);
+        ny = quantiser.quantiseScaledDistance(ny, sc);
       }
       this.setPosition(nx, ny);
     } else {
@@ -117,7 +118,10 @@ $.extend(Triangle.prototype, {
       var dy = y;
       if (data.pt == 0 || data.pt == 1) {
         var r = Math.sqrt(dx * dx + dy * dy);
-        if (snap) r = quantiser.quantiseRadius(r);
+        if (snap) {
+          var sc = this.zoom.scale;
+          r = quantiser.quantiseWorldDistance(r / sc, sc) * sc;
+        }
         this.setRadius(r);
       }
       if (data.pt == 1 || data.pt == 2) {

@@ -99,17 +99,13 @@ $(function() {
       $source.mousemove(function(e) {
         var x = e.pageX - $(e.target).offset().left;
         var y = e.pageY - $(e.target).offset().top;
-        if (1) {
-          zoom.setOffset(init_zoom.x + (x - init_x) / init_zoom.scale, init_zoom.y + (y - init_y) / init_zoom.scale);
-        } else {
-          var nx = init_zoom.x + (x - init_x);
-          var ny = init_zoom.y + (y - init_y);
-          if (Modifiers.down('shift')) {
-            nx = quantiser.quantiseDistance(nx);
-            ny = quantiser.quantiseDistance(ny);
-          }
-          zoom.setOffset(nx / init_zoom.scale, ny / init_zoom.scale);
+        var nx = init_zoom.x + (x - init_x) / init_zoom.scale;
+        var ny = init_zoom.y + (y - init_y) / init_zoom.scale;
+        if (Modifiers.down('shift')) {
+          nx = quantiser.quantiseWorldDistance(nx, init_zoom.scale);
+          ny = quantiser.quantiseWorldDistance(ny, init_zoom.scale);
         }
+        zoom.setOffset(nx, ny);
         controls.redraw();
       });
 
