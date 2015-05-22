@@ -1,6 +1,4 @@
-function Modifiers() {}
-
-(function(me) {
+var Modifiers = (function() {
 
   var modifiers = {};
 
@@ -42,12 +40,14 @@ function Modifiers() {}
     });
   });
 
-  me.down = function(mods) {
-    var modlist = mods.split(/\s+/);
-    for (var i = 0; i < modlist.length; i++) {
-      if (!modifiers[modlist[i]]) return false;
+  return {
+    down: function(mods) {
+      var modlist = mods.split(/\s+/);
+      for (var i = 0; i < modlist.length; i++) {
+        if (!modifiers[modlist[i]]) return false;
+      }
+      return true;
     }
-    return true;
-  }
+  };
 
-})(Modifiers);
+})();
