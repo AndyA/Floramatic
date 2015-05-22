@@ -164,8 +164,12 @@ $(function() {
   }
 
   $(window).on('keydown', null, 'v', function(e) {
+    e.stopPropagation();
+    e.preventDefault();
     showViewer();
   }).on('keydown', null, 'esc', function(e) {
+    e.stopPropagation();
+    e.preventDefault();
     hidePopup($('.popup:visible'));
   });
 
