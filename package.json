@@ -1,0 +1,28 @@
+{
+  "author": "Andy Armstrong <andy@hexten.net>",
+  "bin": {},
+  "bugs": {
+    "url": "https://github.com/AndyA/Floramatic/issues"
+  },
+  "contributors": [],
+  "dependencies": {
+    "body-parser": "^1.12.4",
+    "express": "^4.12.4"
+  },
+  "description": "Florametric Creation Tool",
+  "devDependencies": {},
+  "keywords": [
+    "graphics",
+    "art"
+  ],
+  "license": "MIT",
+  "main": "tools/serve-me.js",
+  "name": "Floramatic",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AndyA/Floramatic"
+  },
+  "scripts": {},
+  "version": "0.0.1"
+}
