@@ -1,18 +1,25 @@
-function Triangle(x, y, r, a) {
+function Triangle(x, y, r, a, zoom) {
+  this.zoom = zoom;
   this.setPosition(x, y);
   this.setRadius(r);
   this.setAngle(a);
   this.colours = ['rgb(255, 96, 96)', 'rgb(192, 96, 255)', 'rgb(96, 96, 255)', 'rgb(96, 255, 96)', 'white'];
+  this.options = {
+    quant_angle: Math.PI / 12,
+    quant_radius: 1.2,
+    quant_distance: 16
+  };
   this.canvas_keeper = new CanvasKeeper();
 }
 
 Triangle.MIN_TILE = 256;
 
 Triangle.prototype = new Control();
+
 $.extend(Triangle.prototype, {
 
   setRadius: function(r) {
-    this.r = r;
+    this.r = Math.max(r, this.metrics.handle_size / 2);
   },
 
   setAngle: function(a) {
@@ -36,7 +43,7 @@ $.extend(Triangle.prototype, {
   draw: function(ctx) {
     ctx.save();
     ctx.translate(-this.x, -this.y);
-    ctx.lineWidth = 3;
+    ctx.lineWidth = this.metrics.line_width;
 
     var corners = this.getCorners();
 
@@ -49,8 +56,8 @@ $.extend(Triangle.prototype, {
       for (var i = 0; i < corners.length; i++) {
         var dot = corners[i];
 
-        var dx = Math.sin(a + Math.PI / 6) * this.hs
-        var dy = Math.cos(a + Math.PI / 6) * this.hs;
+        var dx = Math.sin(a + Math.PI / 6) * this.metrics.handle_size
+        var dy = Math.cos(a + Math.PI / 6) * this.metrics.handle_size;
 
         switch (pass) {
         case 0:
@@ -95,16 +102,31 @@ $.extend(Triangle.prototype, {
   },
 
   mouseMove: function(x, y, data) {
+    var snap = Modifiers.down('shift');
+    var quantiser = this.getQuantiser();
     if (data.pt == 4) {
-      this.setPosition(this.x + x, this.y + y);
+      var nx = this.x + x;
+      var ny = this.y + y;
+      if (snap) {
+        nx = quantiser.quantiseScaledDistance(nx, this.zoom.scale);
+        ny = quantiser.quantiseScaledDistance(ny, this.zoom.scale);
+      }
+      this.setPosition(nx, ny);
     } else {
       var dx = x;
       var dy = y;
       if (data.pt == 0 || data.pt == 1) {
-        this.setRadius(Math.sqrt(dx * dx + dy * dy));
+        var r = Math.sqrt(dx * dx + dy * dy);
+        if (snap) {
+          var sc = this.zoom.scale;
+          r = quantiser.quantiseScaledDistance(r, this.zoom.scale);
+        }
+        this.setRadius(r);
       }
       if (data.pt == 1 || data.pt == 2) {
-        this.setAngle(Math.PI / 2 - Math.PI * 2 * data.pt / 3 - Math.atan2(dy, dx));
+        var a = Math.PI / 2 - Math.PI * 2 * data.pt / 3 - Math.atan2(dy, dx);
+        if (snap) a = quantiser.quantiseAngle(a);
+        this.setAngle(a);
       }
     }
   },
@@ -140,21 +162,23 @@ $.extend(Triangle.prototype, {
     this.canvas_keeper.releaseCanvas(cut.image);
   },
 
-  sample: function(img, zoom) {
+  sample: function(img) {
 
     var cut = this.cuttingForRadius(this.r);
     var ctx = cut.image.getContext('2d');
 
     ctx.save();
 
-    var ccx = zoom.cw / 2;
-    var ccy = zoom.ch / 2;
+    var ccx = this.zoom.cw / 2;
+    var ccy = this.zoom.ch / 2;
 
     ctx.translate(ccx, ccy);
-    ctx.scale(zoom.scale, zoom.scale);
-    ctx.translate((cut.centre_x - ccx) / zoom.scale, (cut.centre_y - ccy) / zoom.scale);
+    ctx.scale(this.zoom.scale, this.zoom.scale);
+    ctx.translate((cut.centre_x - ccx) / this.zoom.scale, (cut.centre_y - ccy) / this.zoom.scale);
     ctx.rotate(this.a);
-    ctx.translate((zoom.ox - zoom.iw / 2) - this.x / zoom.scale, (zoom.oy - zoom.ih / 2) - this.y / zoom.scale);
+    var dx = (this.zoom.ox - this.zoom.iw / 2) - this.x / this.zoom.scale;
+    var dy = (this.zoom.oy - this.zoom.ih / 2) - this.y / this.zoom.scale;
+    ctx.translate(dx, dy);
 
     ctx.drawImage(img, 0, 0);
 
@@ -178,12 +202,6 @@ $.extend(Triangle.prototype, {
     ctx.closePath();
     ctx.fill();
     ctx.strokeStyle = 'black';
-
-    if (0) {
-      ctx.lineWidth = 4;
-      ctx.globalCompositeOperation = 'source-over';
-      ctx.stroke();
-    }
 
     ctx.restore();
 

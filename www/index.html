@@ -2,13 +2,19 @@
 <html>
   <head>
     <title>Floramatic</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" 
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/font-awesome.min.css">
     <script src="js/jquery-2.1.4.min.js"></script>
     <script src="js/jquery.hotkeys.js"></script>
     <script src="js/polyfill.js"></script>
     <script src="js/mathx.js"></script>
+    <script src="js/affine.js"></script>
     <script src="js/canvaskeeper.js"></script>
+    <script src="js/quantiser.js"></script>
+    <script src="js/modifiers.js"></script>
     <script src="js/control.js"></script>
     <script src="js/triangle.js"></script>
     <script src="js/slider.js"></script>
@@ -22,6 +28,7 @@
     </div>
     <div class="canvas-wrapper right">
       <canvas id="destination"></canvas>
+      <div class="controls"><i class="ctl viewer fa fa-2x fa-picture-o"></i></div>
     </div>
     <div class="popup image">
       <img class="dynamic" src=""/>

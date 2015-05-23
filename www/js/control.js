@@ -1,5 +1,8 @@
-function Control(opts) {
-  this.hs = 10; // handle size
+function Control() {
+  this.metrics = {
+    handle_size: 15,
+    line_width: 4.5
+  };
   this.setOrigin(0.5, 0.5);
   this.controls = null;
 }
@@ -30,15 +33,17 @@ $.extend(Control.prototype, {
 
   controlCircle: function(ctx, x, y) {
     ctx.beginPath();
-    ctx.moveTo(x + this.hs, y);
-    ctx.arc(x, y, this.hs, 0, 2 * Math.PI);
+    ctx.moveTo(x + this.metrics.handle_size, y);
+    ctx.arc(x, y, this.metrics.handle_size, 0, 2 * Math.PI);
     ctx.stroke();
   },
 
   inControlCircle: function(cx, cy, x, y) {
     var dx = x - cx;
     var dy = y - cy;
-    return dx * dx + dy * dy <= this.hs * this.hs;
+    var hs = this.metrics.handle_size;
+    if (this.controls.testFlag('fat')) hs *= 2;
+    return dx * dx + dy * dy <= hs * hs;
   },
 
   trigger: function() {
@@ -46,15 +51,36 @@ $.extend(Control.prototype, {
     this.controls.trigger.apply(this.controls, args);
   },
 
+  getQuantiser: function() {
+    return this.controls.options.quantiser;
+  }
+
 });
 
-function Controls(canvas) {
+function Controls(canvas, opts) {
   this.canvas = canvas;
+  this.options = $.extend({},
+  {
+    own_handlers: true
+  },
+  opts);
+  if (!this.options.quantiser) this.options.quantiser = new Quantiser();
+  this.flags = {};
   this.init();
 }
 
-// TODO control set, handle drawing, hit test - etc.
 $.extend(Controls.prototype, {
+
+  setFlag: function(names, state) {
+    if (! (names instanceof Array)) return this.setFlag(names.split(/\s+/), state);
+    for (var i = 0; i < names.length; i++) this.flags[names[i]] = state;
+  },
+
+  testFlag: function(names) {
+    if (! (names instanceof Array)) return this.testFlag(names.split(/\s+/));
+    for (var i = 0; i < names.length; i++) if (!this.flags[names[i]]) return false;
+    return true;
+  },
 
   stopDrag: function() {
     if (this.drag_ctx) {
@@ -75,21 +101,6 @@ $.extend(Controls.prototype, {
     };
   },
 
-  crossHair: function(x, y, style) {
-    var ctx = this.canvas.getContext('2d');
-    ctx.save();
-    ctx.strokeStyle = style;
-    ctx.lineWidth = 4;
-    ctx.translate(x, y);
-    ctx.beginPath();
-    ctx.moveTo(0, -30);
-    ctx.lineTo(0, 30);
-    ctx.moveTo(-30, 0);
-    ctx.lineTo(30, 0);
-    ctx.stroke();
-    ctx.restore();
-  },
-
   lock: function() {
     this.locked++;
   },
@@ -107,54 +118,59 @@ $.extend(Controls.prototype, {
     this.unlock();
   },
 
+  mouseDown: function(e) {
+    this.stopDrag();
+
+    var x = e.pageX - $(e.target).offset().left;
+    var y = e.pageY - $(e.target).offset().top;
+
+    for (var i = 0; i < this.controls.length; i++) {
+      var ctl = this.controls[i];
+
+      var cx = x - (this.canvas.width * ctl.origin_x + ctl.x);
+      var cy = y - (this.canvas.height * ctl.origin_y + ctl.y);
+
+      ctl.mouseDown(cx, cy);
+
+      if (this.drag_ctx) {
+        var ctx = this.drag_ctx;
+        ctx.dx = ctx.x - cx;
+        ctx.dy = ctx.y - cy;
+        var self = this;
+
+        $(this.canvas).on('mousemove.canvascontrols', function(e) {
+          var x = e.pageX - $(e.target).offset().left;
+          var y = e.pageY - $(e.target).offset().top;
+
+          var cx = x - (self.canvas.width * ctx.ctl.origin_x + ctx.ctl.x) + ctx.dx;
+          var cy = y - (self.canvas.height * ctx.ctl.origin_y + ctx.ctl.y) + ctx.dy;
+
+          ctx.ctl.mouseMove(cx, cy, ctx.data);
+          self.redraw();
+        });
+
+        $('body').on('mouseup.canvascontrols', function(e) {
+          self.stopDrag();
+        });
+
+        return true;
+      }
+    }
+    return false;
+  },
+
   init: function() {
     this.controls = [];
     this.drag_ctx = null;
     this.locked = 0;
     this.redraw_pending = 0;
 
-    var self = this;
-
-    $(this.canvas).on('mousedown.canvascontrols', function(e) {
-      if (e.which != 1) return;
-      self.stopDrag();
-
-      var x = e.pageX - $(e.target).offset().left;
-      var y = e.pageY - $(e.target).offset().top;
-
-      for (var i = 0; i < self.controls.length; i++) {
-        var ctl = self.controls[i];
-
-        var cx = x - (self.canvas.width * ctl.origin_x + ctl.x);
-        var cy = y - (self.canvas.height * ctl.origin_y + ctl.y);
-
-        ctl.mouseDown(cx, cy);
-
-        if (self.drag_ctx) {
-          var ctx = self.drag_ctx;
-          ctx.dx = ctx.x - cx;
-          ctx.dy = ctx.y - cy;
-
-          $(self.canvas).on('mousemove.canvascontrols', function(e) {
-            var x = e.pageX - $(e.target).offset().left;
-            var y = e.pageY - $(e.target).offset().top;
-
-            var cx = x - (self.canvas.width * ctx.ctl.origin_x + ctx.ctl.x) + ctx.dx;
-            var cy = y - (self.canvas.height * ctx.ctl.origin_y + ctx.ctl.y) + ctx.dy;
-
-            ctx.ctl.mouseMove(cx, cy, ctx.data);
-            self.redraw();
-          });
-
-          $('body').on('mouseup.canvascontrols', function(e) {
-            self.stopDrag();
-          });
-
-          e.stopImmediatePropagation();
-          break;
-        }
-      }
-    });
+    if (this.options.own_handlers) {
+      var self = this;
+      $(this.canvas).on('mousedown.canvascontrols', function(e) {
+        if (e.which == 1 && self.mouseDown(e)) e.stopImmediatePropagation();
+      });
+    }
   },
 
   destroy: function() {
