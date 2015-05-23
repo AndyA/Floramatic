@@ -43,7 +43,9 @@ $(function() {
 
       var cutting = triangle.sample(image, zoom);
       triangle.tile(cutting, dst_ctx, dst_cvs.width, dst_cvs.height, dst_cvs.width / 2, dst_cvs.height / 2);
+
       controls.draw(src_ctx);
+
     }
 
     dst_ctx.restore();
