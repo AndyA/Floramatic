@@ -7,8 +7,11 @@ var app = express();
 app.use(express.static('www'));
 app.use(bodyParser.json())
 
-app.get('/rconsole/send', function(req, res) {
-  console.log(req.body);
+app.post('/rconsole/send', function(req, res) {
+  var lines = req.body;
+  for (var i = 0; i < lines.length; i++) {
+    console.log.apply(console, lines[i]);
+  }
   res.send({
     status: 'OK'
   });
