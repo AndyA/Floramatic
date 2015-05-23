@@ -101,10 +101,6 @@ $.extend(Controls.prototype, {
     };
   },
 
-  inDrag: function() {
-    return !! this.drag_ctx;
-  },
-
   lock: function() {
     this.locked++;
   },
