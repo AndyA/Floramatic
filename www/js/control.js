@@ -41,7 +41,9 @@ $.extend(Control.prototype, {
   inControlCircle: function(cx, cy, x, y) {
     var dx = x - cx;
     var dy = y - cy;
-    return dx * dx + dy * dy <= this.metrics.handle_size * this.metrics.handle_size;
+    var hs = this.metrics.handle_size;
+    if (this.controls.testFlag('fat')) hs *= 2;
+    return dx * dx + dy * dy <= hs * hs;
   },
 
   trigger: function() {
