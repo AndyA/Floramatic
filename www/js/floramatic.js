@@ -67,11 +67,45 @@ $(function() {
     redraw();
   }
 
+  function touchHandler(elt) {
+    function forwardEvent(target, kind, e) {
+      e.preventDefault();
+      target.trigger($.Event(kind, {
+        pageX: e.targetTouches[0].pageX,
+        pageY: e.targetTouches[0].pageY,
+        which: 1
+      }));
+    }
+
+    function touchEnd(e) {
+      e.preventDefault();
+      $(elt).trigger('mouseup');
+    }
+
+    elt.addEventListener("touchstart", function() {
+      if (controls) controls.setFlag('fat', true);
+      forwardEvent($(elt), 'mousedown', event);
+    },
+    false);
+
+    elt.addEventListener("touchmove", function(e) {
+      forwardEvent($(elt), 'mousemove', e);
+    },
+    true);
+
+    elt.addEventListener("touchend", touchEnd, false);
+    document.body.addEventListener("touchcancel", touchEnd, false);
+  }
+
+  touchHandler($source[0]);
+
   function makeControls(zoom) {
-    $source.off('mousedown.main'); // if reloading
+    $source.off('.main'); // if reloading
+    $('body').off('.main');
     if (controls) controls.destroy();
     controls = new Controls(src_cvs, {
-      quantiser: quantiser
+      quantiser: quantiser,
+      own_handlers: false
     });
 
     var radius = Math.min(src_cvs.width, src_cvs.height) / 5;
@@ -91,6 +125,8 @@ $(function() {
       if (e.which != 1) return;
       if (!zoom) return;
 
+      if (controls.mouseDown(e)) return;
+
       var x = e.pageX - $(e.target).offset().left;
       var y = e.pageY - $(e.target).offset().top;
 
@@ -98,7 +134,7 @@ $(function() {
       var init_y = y;
       var init_zoom = zoom.getState();
 
-      $source.mousemove(function(e) {
+      $source.on('mousemove.main', function(e) {
         var x = e.pageX - $(e.target).offset().left;
         var y = e.pageY - $(e.target).offset().top;
         var nx = init_zoom.x + (x - init_x) / init_zoom.scale;
@@ -111,9 +147,9 @@ $(function() {
         controls.redraw();
       });
 
-      $('body').mouseup(function(e) {
-        $source.off('mousemove');
-        $(this).off('mouseup');
+      $('body').on('mouseup.main', function(e) {
+        $source.off('mousemove.main');
+        $('body').off('mouseup.main');
       });
 
     });
