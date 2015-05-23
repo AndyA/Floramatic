@@ -1,11 +1,16 @@
 var rconsole = (function() {
   var queue = [];
   var sending = false;
+  var pending = false;
 
   function sendQueue() {
+    pending = false;
+
     if (sending || !queue.length) return;
+
     var chunk = queue;
     queue = [];
+    sending = true;
 
     $.ajax({
       url: '/rconsole/send',
@@ -23,7 +28,10 @@ var rconsole = (function() {
   }
 
   function scheduleSend() {
-    if (!sending) setTimeout(sendQueue, 100);
+    if (!sending && !pending) {
+      setTimeout(sendQueue, 100);
+      pending = true;
+    }
   }
 
   return {
