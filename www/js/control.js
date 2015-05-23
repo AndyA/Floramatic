@@ -63,10 +63,22 @@ function Controls(canvas, opts) {
   },
   opts);
   if (!this.options.quantiser) this.options.quantiser = new Quantiser();
+  this.flags = {};
   this.init();
 }
 
 $.extend(Controls.prototype, {
+
+  setFlag: function(names, state) {
+    if (! (names instanceof Array)) return this.setFlag(names.split(/\s+/), state);
+    for (var i = 0; i < names.length; i++) this.flags[names[i]] = state;
+  },
+
+  testFlag: function(names) {
+    if (! (names instanceof Array)) return this.testFlag(names.split(/\s+/));
+    for (var i = 0; i < names.length; i++) if (!this.flags[names[i]]) return false;
+    return true;
+  },
 
   stopDrag: function() {
     if (this.drag_ctx) {
