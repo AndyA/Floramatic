@@ -176,7 +176,7 @@ $(function() {
   function loadRandom(mani) {
     var keys = Object.keys(mani);
     var pick = Math.floor(Math.random() * keys.length);
-    loadImage('art/' + mani[keys[pick]]);
+    loadImage(mani[keys[pick]]);
   }
 
   function showViewer() {
