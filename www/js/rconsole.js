@@ -34,11 +34,22 @@ var rconsole = (function() {
     }
   }
 
-  return {
-    log: function() {
-      queue.push(Array.prototype.slice.apply(arguments));
-      scheduleSend();
-    }
-  };
+  var passthrough = ['assert', 'dir', 'error', 'info', 'log', 'time', 'timeEnd', 'trace', 'warn']
+
+  var obj = {};
+  for (var i = 0; i < passthrough.length; i++) {
+    name = passthrough[i];
+    obj[name] = (function(n) {
+      return function() {
+        queue.push({
+          m: n,
+          a: Array.prototype.slice.apply(arguments)
+        });
+        if (queue.length == 1) scheduleSend();
+      }
+    })(name);
+  }
+
+  return obj;
 
 })();

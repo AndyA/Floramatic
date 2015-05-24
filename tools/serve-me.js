@@ -10,7 +10,7 @@ app.use(bodyParser.json())
 app.post('/rconsole/send', function(req, res) {
   var lines = req.body;
   for (var i = 0; i < lines.length; i++) {
-    console.log.apply(console, lines[i]);
+    console[lines[i].m].apply(console, lines[i].a);
   }
   res.send({
     status: 'OK'
