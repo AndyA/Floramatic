@@ -1,3 +1,5 @@
+"use strict";
+
 function Slider(x, y, opts) {
   this.config = $.extend({},
   {

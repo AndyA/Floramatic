@@ -1,4 +1,5 @@
 $(function() {
+  "use strict";
 
   function redrawCanvas(cvs) {
     var ctx = cvs.getContext('2d');

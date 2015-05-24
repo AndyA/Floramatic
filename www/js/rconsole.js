@@ -1,4 +1,6 @@
 var rconsole = (function() {
+  "use strict";
+
   var queue = [];
   var sending = false;
   var pending = false;

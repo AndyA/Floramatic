@@ -1,3 +1,5 @@
+"use strict";
+
 function Affine(a, b, c, d, e, f) {
   this.a = a;
   this.b = b;

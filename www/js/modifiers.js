@@ -1,4 +1,5 @@
 var Modifiers = (function() {
+  "use strict";
 
   var modifiers = {};
 

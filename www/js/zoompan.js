@@ -1,3 +1,5 @@
+"use strict";
+
 function ZoomPan(cw, ch, iw, ih) {
   this.setCanvasSize(cw, ch);
   this.setImageSize(iw, ih);

@@ -1,3 +1,5 @@
+"use strict";
+
 function Triangle(x, y, r, a, zoom) {
   this.zoom = zoom;
   this.setPosition(x, y);
@@ -269,8 +271,8 @@ $.extend(Triangle.prototype, {
     ctx.save();
 
     ctx.translate(xo - cut.width, yo - cut.height);
-    for (y = 0; y < th; y++) {
-      for (x = 0; x < tw; x++) {
+    for (var y = 0; y < th; y++) {
+      for (var x = 0; x < tw; x++) {
         ctx.drawImage(cut.image, x * cut.width, y * cut.height);
       }
     }

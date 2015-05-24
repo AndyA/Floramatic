@@ -1,3 +1,5 @@
+"use strict";
+
 function Control() {
   this.metrics = {
     handle_size: 15,

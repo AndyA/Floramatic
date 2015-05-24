@@ -1,3 +1,5 @@
+"use strict";
+
 var MathX = {
   fmod: function(x, y) {
     if (y == 0.0) return NaN;

@@ -1,3 +1,5 @@
+"use strict";
+
 function Quantiser(opts) {
   this.options = $.extend({},
   {

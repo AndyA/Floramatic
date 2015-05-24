@@ -1,3 +1,5 @@
+"use strict";
+
 function CanvasKeeper() {
   this.cache = {};
   this.base = 1.4;
