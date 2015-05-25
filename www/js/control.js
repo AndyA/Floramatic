@@ -13,6 +13,7 @@ $.extend(Control.prototype, {
 
   setControls: function(controls) {
     this.controls = controls;
+    return this;
   },
 
   mouseDown: function(x, y) {},
@@ -21,16 +22,19 @@ $.extend(Control.prototype, {
 
   dragThis: function(x, y, data) {
     this.controls.startDrag(this, x, y, data);
+    return this;
   },
 
   setOrigin: function(xfrac, yfrac) {
     this.origin_x = xfrac;
     this.origin_y = yfrac;
+    return this;
   },
 
   setPosition: function(x, y) {
     this.x = x;
     this.y = y;
+    return this;
   },
 
   controlCircle: function(ctx, x, y) {
@@ -38,6 +42,7 @@ $.extend(Control.prototype, {
     ctx.moveTo(x + this.metrics.handle_size, y);
     ctx.arc(x, y, this.metrics.handle_size, 0, 2 * Math.PI);
     ctx.stroke();
+    return this;
   },
 
   inControlCircle: function(cx, cy, x, y) {
@@ -51,6 +56,7 @@ $.extend(Control.prototype, {
   trigger: function() {
     var args = Array.prototype.slice.apply(arguments);
     this.controls.trigger.apply(this.controls, args);
+    return this;
   },
 
   getQuantiser: function() {
