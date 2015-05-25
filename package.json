@@ -6,7 +6,15 @@
          "browserify-shim"
       ]
    },
-   "browserify-shim" : {},
+   "browserify-shim" : {
+      "jquery" : "$",
+      "jquery.hotkeys" : {
+         "depends" : [
+            "jquery"
+         ],
+         "path" : "lib/jquery.hotkeys.js"
+      }
+   },
    "bugs" : {
       "url" : "https://github.com/AndyA/Floramatic/issues"
    },
