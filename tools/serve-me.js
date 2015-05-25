@@ -4,6 +4,7 @@ var express = require('express');
 var bodyParser = require('body-parser')
 var app = express();
 var manifest = require('../lib/manifest.js');
+var builder = require('../lib/builder.js');
 
 var WEBROOT = 'www';
 
@@ -11,6 +12,8 @@ var args = process.argv.slice(2);
 
 var artroot = WEBROOT + '/art';
 if (args.length) artroot = args[0];
+
+builder(['lib/floramatic.js'], 'www/js/main.js');
 
 app.use(bodyParser.json())
 
