@@ -14,7 +14,8 @@
     "express": "^4.12.4",
     "jquery": "^2.1.4",
     "q": "^1.4.1",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "watchify": "^3.2.1"
   },
   "description": "Florametric Creation Tool",
   "devDependencies": {},
@@ -23,7 +24,7 @@
     "art"
   ],
   "license": "MIT",
-  "main": "tools/serve-me.js",
+  "main": "lib/floramatic.js",
   "name": "Floramatic",
   "private": true,
   "repository": {
