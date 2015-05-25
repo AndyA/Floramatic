@@ -144,6 +144,10 @@ $(function() {
           nx = quantiser.quantiseWorldDistance(nx, init_zoom.scale);
           ny = quantiser.quantiseWorldDistance(ny, init_zoom.scale);
         }
+        if (Modifiers.down('alt')) {
+          var st = zoom.getState();
+          triangle.translatePosition((nx - st.x) * st.scale, (ny - st.y) * st.scale);
+        }
         zoom.setOffset(nx, ny);
         controls.redraw();
       });
@@ -221,6 +225,14 @@ $(function() {
   }).on('slide', function(e, ui) {
     if (zoom) {
       var scale = Math.pow(zoom_rate, ui.value / 100);
+      if (Modifiers.down('alt')) {
+        var st = zoom.getState();
+        var tp = triangle.getPosition();
+        var nx = st.x - tp.x / st.scale + tp.x / scale;
+        var ny = st.y - tp.y / st.scale + tp.y / scale;
+        zoom.setOffset(nx, ny);
+        triangle.setRadius(triangle.getRadius() / st.scale * scale);
+      }
       zoom.setScale(scale);
     }
   });
