@@ -47,6 +47,19 @@ $.extend(Control.prototype, {
     return this;
   },
 
+  getPosition: function() {
+    return {
+      x: this.x,
+      y: this.y
+    };
+  },
+
+  translatePosition: function(dx, dy) {
+    this.x += dx;
+    this.y += dy;
+    return this;
+  },
+
   controlCircle: function(ctx, x, y) {
     ctx.beginPath();
     ctx.moveTo(x + this.metrics.handle_size, y);
