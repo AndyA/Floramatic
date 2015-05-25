@@ -158,7 +158,7 @@ $.extend(Controls.prototype, {
 
     var ctls = this.getOrdered();
 
-    for (var i = ctls.length; i-->0;) {
+    for (var i = ctls.length; 0 < i--;) {
       var ctl = ctls[i];
 
       var cx = x - (this.canvas.width * ctl.origin_x + ctl.x);
