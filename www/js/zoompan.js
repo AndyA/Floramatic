@@ -41,11 +41,9 @@ $.extend(ZoomPan.prototype, {
   },
 
   setOffset: function(x, y) {
-    var xr = this.iw / 2;
-    var yr = this.ih / 2;
-
-    this.ox = Math.max(-xr, Math.min(x, xr));
-    this.oy = Math.max(-yr, Math.min(y, yr));
+    this.ox = x;
+    this.oy = y;
+    return this;
   },
 
   getState: function() {
