@@ -6,6 +6,7 @@ function Control() {
     line_width: 4.5
   };
   this.setOrigin(0.5, 0.5);
+  this.setZIndex(0);
   this.controls = null;
 }
 
@@ -13,6 +14,15 @@ $.extend(Control.prototype, {
 
   setControls: function(controls) {
     this.controls = controls;
+    return this;
+  },
+
+  getZIndex: function() {
+    return this.zindex;
+  },
+
+  setZIndex: function(zi) {
+    this.zindex = zi;
     return this;
   },
 
@@ -74,6 +84,7 @@ function Controls(canvas, opts) {
   opts);
   if (!this.options.quantiser) this.options.quantiser = new Quantiser();
   this.flags = {};
+  this.ordered = null;
   this.init();
 }
 
@@ -132,8 +143,10 @@ $.extend(Controls.prototype, {
     var x = e.pageX - $(e.target).offset().left;
     var y = e.pageY - $(e.target).offset().top;
 
-    for (var i = 0; i < this.controls.length; i++) {
-      var ctl = this.controls[i];
+    var ctls = this.getOrdered();
+
+    for (var i = ctls.length; i-->0;) {
+      var ctl = ctls[i];
 
       var cx = x - (this.canvas.width * ctl.origin_x + ctl.x);
       var cy = y - (this.canvas.height * ctl.origin_y + ctl.y);
@@ -189,15 +202,36 @@ $.extend(Controls.prototype, {
     $(this.canvas).trigger(ev, ui);
   },
 
+  getOrdered: function() {
+    if (!this.ordered) {
+      var m = this.controls.map(function(el, i) {
+        return {
+          idx: i,
+          zidx: el.getZIndex(),
+          elt: el
+        };
+      });
+      m.sort(function(a, b) {
+        return a.zidx - b.zidx || a.idx - b.idx;
+      });
+      this.ordered = m.map(function(el) {
+        return el.elt;
+      });
+    }
+    return this.ordered;
+  },
+
   add: function(control) {
     this.controls.push(control);
+    this.ordered = null;
     control.setControls(this);
   },
 
   draw: function(ctx) {
     ctx.save();
-    for (var i = 0; i < this.controls.length; i++) {
-      var ctl = this.controls[i];
+    var ctls = this.getOrdered();
+    for (var i = 0; i < ctls.length; i++) {
+      var ctl = ctls[i];
 
       ctx.save();
       ctx.translate(this.canvas.width * ctl.origin_x + ctl.x, this.canvas.height * ctl.origin_y + ctl.y);
