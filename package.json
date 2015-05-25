@@ -1,28 +1,44 @@
 {
-  "author": "Andy Armstrong <andy@hexten.net>",
-  "bin": {},
-  "bugs": {
-    "url": "https://github.com/AndyA/Floramatic/issues"
-  },
-  "contributors": [],
-  "dependencies": {
-    "body-parser": "^1.12.4",
-    "express": "^4.12.4"
-  },
-  "description": "Florametric Creation Tool",
-  "devDependencies": {},
-  "keywords": [
-    "graphics",
-    "art"
-  ],
-  "license": "MIT",
-  "main": "tools/serve-me.js",
-  "name": "Floramatic",
-  "private": true,
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/AndyA/Floramatic"
-  },
-  "scripts": {},
-  "version": "0.0.1"
+   "author" : "Andy Armstrong <andy@hexten.net>",
+   "bin" : {},
+   "browserify" : {
+      "transform" : [
+         "browserify-shim"
+      ]
+   },
+   "browserify-shim" : {
+      "lib/jquery-2.1.4.min.js" : "$"
+   },
+   "bugs" : {
+      "url" : "https://github.com/AndyA/Floramatic/issues"
+   },
+   "contributors" : [],
+   "dependencies" : {
+      "body-parser" : "^1.12.4",
+      "browserify" : "^10.2.1",
+      "browserify-shim" : "^3.8.7",
+      "chai" : "^2.3.0",
+      "chai-subset" : "^1.0.0",
+      "express" : "^4.12.4",
+      "jquery" : "^2.1.4"
+   },
+   "description" : "Florametric Creation Tool",
+   "devDependencies" : {},
+   "keywords" : [
+      "graphics",
+      "art"
+   ],
+   "license" : "MIT",
+   "main" : "tools/serve-me.js",
+   "name" : "Floramatic",
+   "private" : true,
+   "repository" : {
+      "type" : "git",
+      "url" : "https://github.com/AndyA/Floramatic"
+   },
+   "scripts" : {
+      "build" : "browserify lib/floramatic.js -o www/js/main.js",
+      "watch" : "watchify lib/floramatic.js -o www/js/main.js --debug --verbose"
+   },
+   "version" : "0.0.1"
 }
