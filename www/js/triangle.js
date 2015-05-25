@@ -24,8 +24,16 @@ $.extend(Triangle.prototype, {
     this.r = Math.max(r, this.metrics.handle_size / 2);
   },
 
+  getRadius: function() {
+    return this.r;
+  },
+
   setAngle: function(a) {
     this.a = a;
+  },
+
+  getAngle: function() {
+    return this.a;
   },
 
   getCorners: function() {
