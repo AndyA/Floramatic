@@ -10,6 +10,12 @@ var expect = chai.expect;
 var find = require('../lib/file-find.js');
 var path = require('path');
 
+function relList(root, files) {
+  return files.map(function(fn) {
+    return path.relative(root, fn)
+  });
+}
+
 describe('file-find', function() {
 
   it('should scan an empty dir', function(done_it) {
@@ -49,9 +55,7 @@ describe('file-find', function() {
 
       find(fs_root).then(function(files) {
 
-        var rel = files.map(function(fn) {
-          return path.relative(fs_root, fn)
-        });
+        var rel = relList(fs_root, files);
 
         expect(rel).to.deep.equal(['a', 'b', 'c/d', 'c/e', 'f/g', 'f/h']);
 
@@ -63,9 +67,7 @@ describe('file-find', function() {
 
       find(fs_root, /[ae]$/).then(function(files) {
 
-        var rel = files.map(function(fn) {
-          return path.relative(fs_root, fn)
-        });
+        var rel = relList(fs_root, files);
 
         expect(rel).to.deep.equal(['a', 'c/e']);
 
