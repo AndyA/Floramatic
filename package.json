@@ -1,40 +1,41 @@
 {
-  "author": "Andy Armstrong <andy@hexten.net>",
-  "bin": {},
-  "bugs": {
-    "url": "https://github.com/AndyA/Floramatic/issues"
-  },
-  "contributors": [],
-  "dependencies": {
-    "body-parser": "^1.12.4",
-    "browserify": "^10.2.1",
-    "browserify-shim": "^3.8.7",
-    "chai": "^2.3.0",
-    "chai-subset": "^1.0.0",
-    "express": "^4.12.4",
-    "jquery": "^2.1.4",
-    "q": "^1.4.1",
-    "tmp": "0.0.26",
-    "underscore": "^1.8.3",
-    "watchify": "^3.2.1"
-  },
-  "description": "Florametric Creation Tool",
-  "devDependencies": {},
-  "keywords": [
-    "graphics",
-    "art"
-  ],
-  "license": "MIT",
-  "main": "lib/floramatic.js",
-  "name": "Floramatic",
-  "private": true,
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/AndyA/Floramatic"
-  },
-  "scripts": {
-    "build": "browserify lib/floramatic.js --debug -o www/js/main.js",
-    "watch": "watchify lib/floramatic.js --debug --verbose -o www/js/main.js"
-  },
-  "version": "0.0.1"
+   "author" : "Andy Armstrong <andy@hexten.net>",
+   "bin" : {},
+   "bugs" : {
+      "url" : "https://github.com/AndyA/Floramatic/issues"
+   },
+   "contributors" : [],
+   "dependencies" : {
+      "body-parser" : "^1.12.4",
+      "browserify" : "^10.2.1",
+      "canvas" : "^1.2.3",
+      "chai" : "^2.3.0",
+      "chai-subset" : "^1.0.0",
+      "jquery" : "^2.1.4",
+      "q" : "^1.4.1",
+      "tmp" : "0.0.26",
+      "underscore" : "^1.8.3",
+      "watchify" : "^3.2.1"
+   },
+   "description" : "Florametric Creation Tool",
+   "devDependencies" : {},
+   "keywords" : [
+      "graphics",
+      "art"
+   ],
+   "license" : "MIT",
+   "main" : "lib/floramatic.js",
+   "name" : "Floramatic",
+   "private" : true,
+   "repository" : {
+      "type" : "git",
+      "url" : "https://github.com/AndyA/Floramatic"
+   },
+   "scripts" : {
+      "build" : "browserify lib/floramatic.js --debug -o www/js/main.js",
+      "start" : "node tools/serve-me.js",
+      "test" : "mocha --recursive",
+      "watch" : "watchify lib/floramatic.js --debug --verbose -o www/js/main.js"
+   },
+   "version" : "0.0.1"
 }
