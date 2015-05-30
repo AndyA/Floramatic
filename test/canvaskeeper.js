@@ -18,4 +18,16 @@ describe('CanvasKeeper', function() {
 
   });
 
+  it('should recycle a canvas', function() {
+    var cc = new CanvasKeeper();
+    var c1 = cc.getCanvas(100, 200);
+
+    cc.releaseCanvas(c1);
+
+    var c2 = cc.getCanvas(100, 200);
+
+    expect(c1).to.equal(c2);
+
+  });
+
 });
