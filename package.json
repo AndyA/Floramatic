@@ -13,6 +13,8 @@
       "chai" : "^2.3.0",
       "chai-subset" : "^1.0.1",
       "jquery" : "^2.1.4",
+      "node-uuid" : "^1.4.3",
+      "request" : "^2.57.0",
       "tmp" : "0.0.26",
       "underscore" : "^1.8.3",
       "watchify" : "^3.2.1"
