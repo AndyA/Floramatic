@@ -20,13 +20,14 @@ app.use(bodyParser.json())
 
 app.use('/rconsole', rconsole);
 
-app.use(function(err, req, res, next) {
-  var msg = err.msg || '500 - Internal Server Error';
-  res.send(500, {
-    error: msg
-  });
-});
+if (1) app.use(require('../lib/ui-movie.js'));
 
+//app.use(function(err, req, res, next) {
+//  var msg = err.msg || '500 - Internal Server Error';
+//  res.status(500).send({
+//    error: msg
+//  });
+//});
 app.get('/art/manifest.json', function(req, res, next) {
   manifest(artroot, /\.(?:png|jpeg|jpg)$/i, '/art').then(function(mani) {
     res.send(mani);
