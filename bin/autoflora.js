@@ -16,10 +16,12 @@ var out = fs.createWriteStream('out.mjpeg');
 function makeFrame(fno, img) {
 
   var tri = {
-    x: Math.sin((fno + 10) * 0.001) * Math.sin(fno * 0.0012) * (img.width / 5),
-    y: Math.sin((fno + 20) * 0.0013) * Math.sin(fno * 0.008) * (img.height / 5),
-    a: Math.sin((fno + 30) * 0.071) * Math.sin(fno * 0.03) * Math.PI,
-    r: (Math.sin(fno * 0.03) * Math.sin(fno * 0.018) + 1.2) * 100
+    x: Math.sin((fno + 10) * 0.019) * Math.sin(fno * 0.0012) * (img.width / 5),
+    y: Math.sin((fno + 20) * 0.013) * Math.sin(fno * 0.008) * (img.height / 5),
+    a: Math.sin((fno + 30) * 0.0071) * Math.sin(fno * 0.013) * Math.PI,
+    r: (Math.sin(fno * 0.003) * Math.sin(fno * 0.0018) + 1.05) * 90,
+    xo: Math.sin((fno + 40) * 0.021) * Math.sin(fno * 0.0011) * 300,
+    yo: Math.sin((fno + 50) * 0.039) * Math.sin(fno * 0.0093) * 300
   };
 
   console.log('frame ' + fno + ', args: ' + JSON.stringify(tri));
