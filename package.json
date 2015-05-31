@@ -33,7 +33,7 @@
    },
    "scripts" : {
       "build" : "browserify lib/floramatic.js --debug -o www/js/main.js",
-      "start" : "node tools/serve-me.js",
+      "start" : "node bin/serve-me.js",
       "test" : "mocha --recursive",
       "watch" : "watchify lib/floramatic.js --debug --verbose -o www/js/main.js"
    },
