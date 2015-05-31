@@ -5,6 +5,7 @@ var bodyParser = require('body-parser')
 var app = express();
 var manifest = require('../lib/manifest.js');
 var builder = require('../lib/builder.js');
+var rconsole = require('../lib/rconsole/server.js');
 
 var WEBROOT = 'www';
 
@@ -17,6 +18,8 @@ builder(['lib/floramatic.js'], 'www/js/main.js');
 
 app.use(bodyParser.json())
 
+app.use('/rconsole', rconsole);
+
 app.use(function(err, req, res, next) {
   var msg = err.msg || '500 - Internal Server Error';
   res.send(500, {
@@ -27,16 +30,6 @@ app.use(function(err, req, res, next) {
 app.get('/art/manifest.json', function(req, res, next) {
   manifest(artroot, /\.(?:png|jpeg|jpg)$/i, '/art').then(function(mani) {
     res.send(mani);
-  });
-});
-
-app.post('/rconsole/send', function(req, res) {
-  var lines = req.body;
-  for (var i = 0; i < lines.length; i++) {
-    console[lines[i].m].apply(console, lines[i].a);
-  }
-  res.send({
-    status: 'OK'
   });
 });
 
