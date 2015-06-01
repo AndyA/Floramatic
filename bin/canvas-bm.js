@@ -137,7 +137,9 @@ loadImage(img_src).then(function(img) {
   }).add('jpegStream', function(deferred) {
     withOutFile(10, function(ostm) {
       console.log('pipe jpeg');
-      var stm = canvas.jpegStream();
+      var stm = canvas.jpegStream({
+        quality: 100
+      });
       return pipe(stm, ostm).then(function() {
         return ostm;
       });
