@@ -43,7 +43,7 @@ function pipe(istm, ostm) {
 
 function outFile() {
   var name = uuid.v4() + '.tmp';
-  console.log('writing', name);
+  //  console.log('writing', name);
   return fs.createWriteStream(name);
 }
 
@@ -124,7 +124,6 @@ loadImage(img_src).then(function(img) {
 
   suite.add('toBuffer', function(deferred) {
     withOutFile(10, function(ostm) {
-      console.log('write buffer');
       var buf = canvas.toBuffer();
       ostm.write(buf);
       return ostm;
@@ -136,10 +135,21 @@ loadImage(img_src).then(function(img) {
     defer: true
   }).add('jpegStream', function(deferred) {
     withOutFile(10, function(ostm) {
-      console.log('pipe jpeg');
       var stm = canvas.jpegStream({
         quality: 100
       });
+      return pipe(stm, ostm).then(function() {
+        return ostm;
+      });
+    }).then(function() {
+      deferred.resolve()
+    });
+  },
+  {
+    defer: true
+  }).add('pngStream', function(deferred) {
+    withOutFile(10, function(ostm) {
+      var stm = canvas.pngStream();
       return pipe(stm, ostm).then(function() {
         return ostm;
       });
