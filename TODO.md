@@ -1,3 +1,7 @@
+# SmooList
+
+* Invert colours
+
 # TODO
 
 * make current state bookmarkable
