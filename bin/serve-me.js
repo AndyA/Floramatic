@@ -20,7 +20,7 @@ app.use(bodyParser.json())
 
 app.use('/rconsole', rconsole);
 
-if (0) app.use(require('../lib/ui-movie.js'));
+if (1) app.use(require('../lib/ui-movie.js'));
 
 //app.use(function(err, req, res, next) {
 //  var msg = err.msg || '500 - Internal Server Error';
