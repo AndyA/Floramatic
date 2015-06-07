@@ -2,8 +2,6 @@
 
 var chai = require("chai");
 chai.use(require('chai-subset'));
-var Q = require('q');
-
 var tempfs = require('./lib/temp-fs.js');
 
 var expect = chai.expect;

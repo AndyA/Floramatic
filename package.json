@@ -16,6 +16,7 @@
       "jquery" : "^2.1.4",
       "microtime" : "^1.4.2",
       "node-uuid" : "^1.4.3",
+      "q" : "^1.4.1",
       "request" : "^2.57.0",
       "tmp" : "0.0.26",
       "underscore" : "^1.8.3",
