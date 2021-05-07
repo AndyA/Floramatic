@@ -19,7 +19,7 @@
     "q": "^1.4.1",
     "request": "^2.57.0",
     "tmp": "0.0.26",
-    "underscore": "^1.8.3",
+    "underscore": "^1.12.1",
     "watchify": "^3.2.1"
   },
   "description": "Florametric Creation Tool",
